@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merry Bells</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #ffffff;
+      color: #1e293b;
+      overflow-x: hidden;
+    }
+    .font-game {
+      font-family: 'Fredoka', 'Inter', system-ui, sans-serif;
+    }
+
+    /* Peppermint Candy-Cane Top Strip */
+    .candy-strip {
+      height: 8px;
+      background: repeating-linear-gradient(
+        -45deg,
+        #ef4444,
+        #ef4444 12px,
+        #ffffff 12px,
+        #ffffff 24px,
+        #22c55e 24px,
+        #22c55e 36px,
+        #ffffff 36px,
+        #ffffff 48px
+      );
+    }
+
+    /* Die-cut paper cutout drop shadow */
+    .paper-cutout {
+      filter: drop-shadow(0 8px 12px rgba(15, 23, 42, 0.16));
+    }
+
+    /* Paper Puppet Animations (matching Candy Crush cutout stick puppets) */
+    @keyframes tagSwing {
+      0%, 100% { transform: rotate(-2.5deg); }
+      50%      { transform: rotate(2.5deg); }
+    }
+    @keyframes puppetPopLeft {
+      0%   { transform: translateY(120px) rotate(-14deg) scale(0.85); opacity: 0; }
+      70%  { transform: translateY(-8px) rotate(4deg) scale(1.03); opacity: 1; }
+      100% { transform: translateY(0px) rotate(-3deg) scale(1); opacity: 1; }
+    }
+    @keyframes puppetPopRight {
+      0%   { transform: translateY(120px) rotate(14deg) scale(0.85); opacity: 0; }
+      70%  { transform: translateY(-8px) rotate(-4deg) scale(1.03); opacity: 1; }
+      100% { transform: translateY(0px) rotate(3deg) scale(1); opacity: 1; }
+    }
+    @keyframes puppetBob {
+      0%, 100% { transform: translateY(0px) rotate(-2deg); }
+      50%      { transform: translateY(-10px) rotate(2deg); }
+    }
+    @keyframes armWaveL {
+      0%, 100% { transform: rotate(-18deg); }
+      50%      { transform: rotate(22deg); }
+    }
+    @keyframes armWaveR {
+      0%, 100% { transform: rotate(18deg); }
+      50%      { transform: rotate(-22deg); }
+    }
+    @keyframes paperSnow {
+      0%   { transform: translateY(-30px) rotate(0deg); opacity: 0; }
+      15%  { opacity: 0.9; }
+      85%  { opacity: 0.9; }
+      100% { transform: translateY(105vh) rotate(240deg); opacity: 0; }
+    }
+
+    .tag-pendulum {
+      transform-origin: top center;
+      animation: tagSwing 2.6s ease-in-out infinite;
+    }
+    .puppet-left-enter {
+      animation: puppetPopLeft 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .puppet-right-enter {
+      animation: puppetPopRight 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .puppet-bob {
+      animation: puppetBob 2.2s ease-in-out infinite;
+    }
+    .arm-wave-l {
+      transform-origin: 54px 108px;
+      animation: armWaveL 0.9s ease-in-out infinite;
+    }
+    .arm-wave-r {
+      transform-origin: 126px 108px;
+      animation: armWaveR 0.9s ease-in-out infinite;
+    }
+    .paper-flake {
+      position: absolute;
+      top: -30px;
+      pointer-events: none;
+      animation: paperSnow linear infinite;
+    }
+
+    /* Glossy Candy-Button 3D Bevel */
+    .candy-btn {
+      transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .candy-btn:hover { transform: translateY(-2px) scale(1.015); }
+    .candy-btn:active { transform: translateY(2px) scale(0.98); }
+
+    .view-hidden { display: none !important; }
+
+    /* Winter Wonderland Animated Background */
+    .ww-scene {
+      position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+      background: linear-gradient(180deg,#00b8ff 0%,#38d8ff 38%,#b8f5ff 72%,#f4fdff 100%);
+    }
+    .ww-sun {
+      position: absolute; width: 38vw; height: 38vw; min-width: 280px; min-height: 280px;
+      top: -20vw; left: 32%; border-radius: 50%;
+      background: radial-gradient(circle,#fff9d7 0%,#fff9d766 34%,transparent 70%);
+      opacity: .9; animation: wwBreathe 7s ease-in-out infinite;
+    }
+    .ww-aurora {
+      position: absolute; inset: -20% -10% auto; height: 62%; opacity: .38; filter: blur(20px);
+      background: linear-gradient(115deg,transparent 12%,#c2ffef 28%,transparent 44%,#f4caff 63%,transparent 78%);
+      transform: rotate(-8deg); animation: wwAurora 18s ease-in-out infinite alternate;
+    }
+    .ww-cloud {
+      position: absolute; width: 150px; height: 42px; background: #fff; border-radius: 50px;
+      filter: drop-shadow(0 5px 0 #b8eaf8); opacity: .94; animation: wwCloud 34s linear infinite;
+    }
+    .ww-cloud:before, .ww-cloud:after { content: ""; position: absolute; background: inherit; border-radius: 50%; }
+    .ww-cloud:before { width: 65px; height: 65px; left: 24px; bottom: 7px; }
+    .ww-cloud:after { width: 82px; height: 78px; right: 22px; bottom: 2px; }
+    .ww-c1 { top: 12%; left: -170px; transform: scale(.85); animation-duration: 42s; }
+    .ww-c2 { top: 24%; left: 52%; transform: scale(.58); animation-duration: 55s; animation-delay: -22s; }
+    .ww-c3 { top: 8%; left: 82%; transform: scale(.72); animation-duration: 48s; animation-delay: -16s; }
+    .ww-mountains { position: absolute; left: 0; right: 0; bottom: 29%; height: 27%; opacity: .8; }
+    .ww-mountains svg, .ww-pines svg { width: 100%; height: 100%; display: block; }
+    .ww-pines { position: absolute; bottom: 26%; left: 0; width: 100%; height: 19%; opacity: .55; }
+    .ww-hill {
+      position: absolute; left: -8%; width: 116%; border-radius: 50% 50% 0 0;
+      border-top: 10px solid #fff9ee; box-shadow: inset 0 9px 0 #b8f3e2;
+    }
+    .ww-hill.back { height: 42%; bottom: 15%; background: linear-gradient(180deg,#7bff75,#00d078); transform: rotate(4deg); }
+    .ww-hill.front { height: 37%; bottom: -7%; background: linear-gradient(180deg,#fff 0%,#f2fdff 24%,#c7f1ff 100%); border-top-width: 13px; transform: rotate(-2deg); }
+    .ww-snowbank { position: absolute; bottom: -18%; left: -10%; width: 120%; height: 42%; border-radius: 50% 50% 0 0; background: linear-gradient(180deg,#fff 0%,#eafaff 70%); }
+    .ww-tree {
+      position: absolute; z-index: 2; bottom: 22%; width: clamp(90px,13vw,175px); transform-origin: bottom center;
+      filter: drop-shadow(0 8px 0 #268f7b55); animation: wwSway 5s ease-in-out infinite;
+    }
+    .ww-tree svg, .ww-char svg { width: 100%; height: auto; overflow: visible; }
+    .ww-tree.left { left: 2%; bottom: 21%; animation-delay: -1.5s; }
+    .ww-tree.right { right: 3%; bottom: 21%; width: clamp(110px,15vw,195px); animation-delay: -3s; }
+    .ww-tree.mid { left: 22%; bottom: 18%; width: clamp(75px,9vw,120px); animation-delay: -2s; }
+    .ww-char {
+      position: absolute; z-index: 3; transform-origin: 50% 90%;
+      filter: drop-shadow(0 8px 0 #367f9955); animation: wwFloaty 3.4s ease-in-out infinite;
+    }
+    .ww-elf { left: 9%; bottom: 21%; width: clamp(95px,12vw,160px); animation-delay: -.7s; }
+    .ww-snowman { right: 14%; bottom: 18%; width: clamp(95px,12vw,160px); animation-delay: -1.8s; }
+    .ww-cane { position: absolute; z-index: 2; width: clamp(32px,4.5vw,60px); bottom: 13%; filter: drop-shadow(0 5px 0 #9b8d9a55); animation: wwWiggle 4s ease-in-out infinite; }
+    .ww-cane.one { left: 38%; transform: rotate(-13deg); }
+    .ww-cane.two { right: 38%; bottom: 10%; transform: rotate(12deg); animation-delay: -2s; }
+    .ww-lolli { position: absolute; z-index: 3; width: clamp(44px,5.5vw,76px); bottom: 8%; animation: wwBob 3s ease-in-out infinite; }
+    .ww-lolli.a { left: 27%; transform: rotate(-12deg); }
+    .ww-lolli.b { right: 27%; bottom: 6%; animation-delay: -1.4s; }
+    .ww-gum {
+      position: absolute; z-index: 3; width: clamp(22px,3.2vw,44px); height: clamp(30px,4.2vw,56px);
+      border-radius: 55% 55% 48% 48%; border: 3px solid #fff9;
+      box-shadow: inset -7px -8px 0 #00000015, inset 5px 5px 0 #ffffff77, 0 6px 0 #4b9b9b55;
+      animation: wwJelly 3.2s ease-in-out infinite;
+    }
+    .ww-g1 { left: 7%; bottom: 10%; background: #ff32a0; transform: rotate(-25deg); }
+    .ww-g2 { left: 18%; bottom: 6%; background: #ffe22e; animation-delay: -1s; }
+    .ww-g3 { right: 10%; bottom: 12%; background: #a34cff; transform: rotate(22deg); animation-delay: -2s; }
+    .ww-g4 { right: 19%; bottom: 4%; background: #00d6a5; animation-delay: -.5s; }
+    .ww-snow { position: absolute; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
+    .ww-flake { position: absolute; top: -20px; color: #fff; opacity: .9; text-shadow: 0 0 7px #fff; animation: wwFall linear infinite; }
+    @keyframes wwFall { to { transform: translate3d(var(--drift), 110vh, 0) rotate(360deg); } }
+    @keyframes wwCloud { from { translate: 0 0; } to { translate: calc(100vw + 240px) 0; } }
+    @keyframes wwFloaty { 0%,100% { translate: 0 0; rotate: -2deg; } 50% { translate: 0 -12px; rotate: 2deg; } }
+    @keyframes wwSway { 0%,100% { rotate: -2deg; } 50% { rotate: 2deg; } }
+    @keyframes wwWiggle { 0%,100% { rotate: -5deg; } 50% { rotate: 5deg; } }
+    @keyframes wwBob { 0%,100% { translate: 0 0; } 50% { translate: 0 -9px; } }
+    @keyframes wwJelly { 0%,100% { scale: 1; } 50% { scale: 1.08 .94; } }
+    @keyframes wwBreathe { 0%,100% { opacity: .55; scale: 1; } 50% { opacity: .9; scale: 1.08; } }
+    @keyframes wwAurora { from { translate: -4% 0; rotate: -8deg; } to { translate: 5% 4%; rotate: 3deg; } }
+  </style>
+</head>
+<body class="min-h-screen bg-[#b8efff] text-slate-800 select-none antialiased">
+  <!-- =========================================================
+       ANIMATED WINTER WONDERLAND PAPER-CUTOUT BACKGROUND
+       ========================================================= -->
+  <div class="ww-scene" aria-hidden="true">
+    <div class="ww-sun"></div><div class="ww-aurora"></div>
+    <div class="ww-cloud ww-c1"></div><div class="ww-cloud ww-c2"></div><div class="ww-cloud ww-c3"></div>
+    <div class="ww-mountains">
+      <svg viewBox="0 0 1600 300" preserveAspectRatio="none">
+        <path d="M0 230 L130 80 230 190 365 35 500 190 630 80 760 205 900 40 1030 190 1170 70 1310 195 1440 55 1600 220 V300 H0Z" fill="#b8e8f2"/>
+        <path d="M0 230 L130 80 170 126 130 115 95 155 130 80 230 190 365 35 410 92 365 73 330 120 365 35 500 190 630 80 674 130 630 115 590 153 630 80 760 205 900 40 946 104 900 85 864 128 900 40 1030 190 1170 70 1212 120 1170 103 1130 150 1170 70 1310 195 1440 55 1485 111 1440 92 1400 135 1440 55 1600 220" fill="#e9fbff"/>
+      </svg>
+    </div>
+    <div class="ww-pines">
+      <svg viewBox="0 0 1600 180" preserveAspectRatio="none">
+        <g fill="#238f88">
+          <path d="M40 180V85L5 125 40 35 75 125 48 110V180ZM180 180V65L135 115 180 10 225 115 195 94V180ZM340 180V88L300 130 340 30 380 130 355 108V180ZM540 180V50L490 115 540 0 590 115 560 90V180ZM760 180V78L720 125 760 25 800 125 775 105V180ZM990 180V48L945 112 990 0 1035 112 1008 91V180ZM1230 180V75L1185 125 1230 18 1275 125 1248 100V180ZM1460 180V58L1415 118 1460 0 1505 118 1478 94V180Z"/>
+        </g>
+      </svg>
+    </div>
+    <div class="ww-hill back"></div><div class="ww-hill front"></div><div class="ww-snowbank"></div>
+    <div class="ww-tree left"><svg viewBox="0 0 180 250"><path d="M83 168h22v72H83z" fill="#a96c49" stroke="#fff" stroke-width="5"/><path d="M94 5 25 105h35L12 158h53L0 210h180l-65-52h53l-48-53h35z" fill="#00bd78" stroke="#fff" stroke-width="8" stroke-linejoin="round"/><path d="M94 5 65 48l27-9 22 18 16-4-36-48z" fill="#8bf0d2"/><g fill="#fff"><circle cx="55" cy="95" r="7"/><circle cx="128" cy="137" r="8"/><circle cx="83" cy="174" r="7"/></g><g fill="#ffda6b" stroke="#fff" stroke-width="3"><circle cx="92" cy="83" r="8"/><circle cx="135" cy="175" r="7"/></g></svg></div>
+    <div class="ww-tree mid"><svg viewBox="0 0 180 250"><path d="M83 168h22v72H83z" fill="#a96c49" stroke="#fff" stroke-width="5"/><path d="M94 5 25 105h35L12 158h53L0 210h180l-65-52h53l-48-53h35z" fill="#00a99b" stroke="#fff" stroke-width="8" stroke-linejoin="round"/><path d="M94 5 65 48l27-9 22 18 16-4-36-48z" fill="#b2fff0"/></svg></div>
+    <div class="ww-tree right"><svg viewBox="0 0 180 250"><path d="M83 168h22v72H83z" fill="#a96c49" stroke="#fff" stroke-width="5"/><path d="M94 5 25 105h35L12 158h53L0 210h180l-65-52h53l-48-53h35z" fill="#00c878" stroke="#fff" stroke-width="8" stroke-linejoin="round"/><path d="M94 5 65 48l27-9 22 18 16-4-36-48z" fill="#b2fff0"/><g fill="#ff79b9" stroke="#fff" stroke-width="3"><circle cx="92" cy="83" r="8"/><circle cx="135" cy="175" r="7"/></g></svg></div>
+    <div class="ww-char ww-elf">
+      <svg viewBox="0 0 180 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="85" y="170" width="10" height="90" rx="4" fill="#92400e"/>
+        <circle cx="90" cy="132" r="52" fill="#fffdf5" stroke="#f3ead3" stroke-width="6"/>
+        <circle cx="90" cy="70" r="38" fill="#fffdf5" stroke="#f3ead3" stroke-width="6"/>
+        <rect x="64" y="18" width="52" height="24" rx="5" fill="#fffdf5" stroke="#f3ead3" stroke-width="6"/>
+        <circle cx="90" cy="132" r="45" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+        <circle cx="90" cy="70" r="31" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+        <path d="M62 94C72 102 108 102 118 94L115 106C104 112 76 112 65 106Z" fill="#ef4444"/>
+        <rect x="98" y="98" width="12" height="28" rx="4" fill="#dc2626"/>
+        <rect x="64" y="34" width="52" height="8" rx="4" fill="#1e293b"/>
+        <rect x="72" y="12" width="36" height="24" rx="4" fill="#1e293b"/>
+        <rect x="72" y="29" width="36" height="5" fill="#ef4444"/>
+        <circle cx="80" cy="64" r="3.5" fill="#0f172a"/>
+        <circle cx="100" cy="64" r="3.5" fill="#0f172a"/>
+        <polygon points="90,68 112,73 90,77" fill="#f97316"/>
+        <path d="M78 81C83 86 97 86 102 81" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="90" cy="122" r="4" fill="#1e293b"/>
+        <circle cx="90" cy="138" r="4" fill="#1e293b"/>
+        <g class="arm-wave-l">
+          <rect x="16" y="102" width="42" height="12" rx="6" fill="#fffdf5" stroke="#cbd5e1" stroke-width="3"/>
+          <rect x="20" y="105" width="34" height="6" rx="3" fill="#92400e"/>
+          <circle cx="54" cy="108" r="5" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+        </g>
+        <g class="arm-wave-r">
+          <rect x="122" y="102" width="42" height="12" rx="6" fill="#fffdf5" stroke="#cbd5e1" stroke-width="3"/>
+          <rect x="126" y="105" width="34" height="6" rx="3" fill="#92400e"/>
+          <circle cx="126" cy="108" r="5" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+        </g>
+      </svg>
+    </div>
+    <div class="ww-char ww-snowman">
+      <svg viewBox="0 0 180 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="85" y="170" width="10" height="90" rx="4" fill="#92400e"/>
+        <path d="M90 28C65 28 46 47 46 72V148C46 164 60 176 90 176C120 176 134 164 134 148V72C134 47 115 28 90 28Z" fill="#fffdf5" stroke="#f3ead3" stroke-width="8"/>
+        <circle cx="90" cy="68" r="28" fill="#d97706"/>
+        <rect x="64" y="92" width="52" height="64" rx="22" fill="#d97706"/>
+        <path d="M68 104Q79 112 90 104Q101 112 112 104" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="90" cy="126" r="5" fill="#ef4444"/>
+        <circle cx="90" cy="142" r="5" fill="#22c55e"/>
+        <circle cx="80" cy="63" r="3.5" fill="#0f172a"/>
+        <circle cx="100" cy="63" r="3.5" fill="#0f172a"/>
+        <circle cx="74" cy="71" r="4" fill="#fb7185" opacity="0.6"/>
+        <circle cx="106" cy="71" r="4" fill="#fb7185" opacity="0.6"/>
+        <path d="M80 74C85 80 95 80 100 74" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+        <polygon points="78,94 90,100 78,106" fill="#ef4444"/>
+        <polygon points="102,94 90,100 102,106" fill="#ef4444"/>
+        <circle cx="90" cy="100" r="4" fill="#b91c1c"/>
+        <g class="arm-wave-l">
+          <rect x="26" y="102" width="34" height="16" rx="8" fill="#d97706" stroke="#fffdf5" stroke-width="4"/>
+          <circle cx="56" cy="110" r="5" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+        </g>
+        <g class="arm-wave-r">
+          <rect x="120" y="102" width="34" height="16" rx="8" fill="#d97706" stroke="#fffdf5" stroke-width="4"/>
+          <circle cx="124" cy="110" r="5" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+        </g>
+      </svg>
+    </div>
+    <div class="ww-cane one"><svg viewBox="0 0 70 150"><path d="M18 140V43a27 27 0 0 1 54 0v15" fill="none" stroke="#fff" stroke-width="24" stroke-linecap="round"/><path d="M18 140V43a27 27 0 0 1 54 0v15" fill="none" stroke="#f05275" stroke-width="24" stroke-dasharray="17 17"/></svg></div>
+    <div class="ww-cane two"><svg viewBox="0 0 70 150"><path d="M18 140V43a27 27 0 0 1 54 0v15" fill="none" stroke="#fff" stroke-width="24" stroke-linecap="round"/><path d="M18 140V43a27 27 0 0 1 54 0v15" fill="none" stroke="#e94b71" stroke-width="24" stroke-dasharray="17 17"/></svg></div>
+    <div class="ww-lolli a"><svg viewBox="0 0 90 140"><path d="M45 60v78" stroke="#fff" stroke-width="9" stroke-linecap="round"/><circle cx="45" cy="42" r="37" fill="#ff32a0" stroke="#fff" stroke-width="7"/><circle cx="45" cy="42" r="20" fill="none" stroke="#ffd66e" stroke-width="6"/></svg></div>
+    <div class="ww-lolli b"><svg viewBox="0 0 90 140"><path d="M45 60v78" stroke="#fff" stroke-width="9" stroke-linecap="round"/><circle cx="45" cy="42" r="37" fill="#ffbd16" stroke="#fff" stroke-width="7"/><circle cx="45" cy="42" r="20" fill="none" stroke="#fff" stroke-width="6"/></svg></div>
+    <div class="ww-gum ww-g1"></div><div class="ww-gum ww-g2"></div><div class="ww-gum ww-g3"></div><div class="ww-gum ww-g4"></div>
+    <div class="ww-snow" id="ww-snow"></div>
+  </div>
+
+
+  <!-- =========================================================
+       SPLASH SCREEN (White background + Paper-Cutout Puppets)
+       ========================================================= -->
+  <div id="splash-screen" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-between overflow-hidden transition-opacity duration-700 cursor-pointer">
+    <div id="snow-layer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+
+    <!-- Hanging Paper-Tag Logo on Twine -->
+    <div class="relative z-10 flex flex-col items-center tag-pendulum">
+      <!-- Twine String -->
+      <div class="w-1.5 h-16 sm:h-24 bg-gradient-to-b from-amber-800 to-amber-700 rounded-b"></div>
+      <!-- Die-Cut Cream Paper Tag -->
+      <div class="paper-cutout -mt-2 bg-[#fffdf5] border-[5px] border-[#f3ead3] rounded-[2rem] px-8 sm:px-12 py-5 sm:py-6 relative flex flex-col items-center">
+        <!-- Brass Eyelet Hole -->
+        <div class="w-5 h-5 rounded-full bg-amber-100 border-4 border-amber-600 -mt-9 mb-2 shadow-inner"></div>
+        <h1 class="font-game text-5xl sm:text-6xl font-bold tracking-tight text-rose-600 drop-shadow-sm">
+          Merry <span class="text-emerald-600">Bells</span>
+        </h1>
+        <span class="mt-1 text-xs font-extrabold uppercase tracking-widest text-amber-700/80">Holiday Handbell Game</span>
+      </div>
+    </div>
+
+    <!-- Bottom Stage: Two Articulated Paper-Cutout Puppets on Wooden Sticks -->
+    <div class="relative z-10 w-full max-w-3xl px-6 flex items-end justify-between sm:justify-around pb-0">
+      <!-- Left Puppet: Cutout Snowman on Stick -->
+      <div class="puppet-left-enter">
+        <div class="puppet-bob">
+          <svg class="w-36 sm:w-44 h-auto paper-cutout" viewBox="0 0 180 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Wooden Stick -->
+            <rect x="85" y="170" width="10" height="90" rx="4" fill="#92400e"/>
+            <!-- Cream Die-Cut Paper Backing -->
+            <circle cx="90" cy="132" r="52" fill="#fffdf5" stroke="#f3ead3" stroke-width="6"/>
+            <circle cx="90" cy="70" r="38" fill="#fffdf5" stroke="#f3ead3" stroke-width="6"/>
+            <rect x="64" y="18" width="52" height="24" rx="5" fill="#fffdf5" stroke="#f3ead3" stroke-width="6"/>
+            <!-- Snowman Body -->
+            <circle cx="90" cy="132" r="45" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <circle cx="90" cy="70" r="31" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <!-- Red Scarf -->
+            <path d="M62 94C72 102 108 102 118 94L115 106C104 112 76 112 65 106Z" fill="#ef4444"/>
+            <rect x="98" y="98" width="12" height="28" rx="4" fill="#dc2626"/>
+            <!-- Top Hat -->
+            <rect x="64" y="34" width="52" height="8" rx="4" fill="#1e293b"/>
+            <rect x="72" y="12" width="36" height="24" rx="4" fill="#1e293b"/>
+            <rect x="72" y="29" width="36" height="5" fill="#ef4444"/>
+            <!-- Face -->
+            <circle cx="80" cy="64" r="3.5" fill="#0f172a"/>
+            <circle cx="100" cy="64" r="3.5" fill="#0f172a"/>
+            <polygon points="90,68 112,73 90,77" fill="#f97316"/>
+            <path d="M78 81C83 86 97 86 102 81" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/>
+            <!-- Buttons -->
+            <circle cx="90" cy="122" r="4" fill="#1e293b"/>
+            <circle cx="90" cy="138" r="4" fill="#1e293b"/>
+            <!-- Articulated Paper Arms with Brass Brads -->
+            <g class="arm-wave-l">
+              <rect x="16" y="102" width="42" height="12" rx="6" fill="#fffdf5" stroke="#cbd5e1" stroke-width="3"/>
+              <rect x="20" y="105" width="34" height="6" rx="3" fill="#92400e"/>
+              <circle cx="54" cy="108" r="5" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+            </g>
+            <g class="arm-wave-r">
+              <rect x="122" y="102" width="42" height="12" rx="6" fill="#fffdf5" stroke="#cbd5e1" stroke-width="3"/>
+              <rect x="126" y="105" width="34" height="6" rx="3" fill="#92400e"/>
+              <circle cx="126" cy="108" r="5" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Right Puppet: Cutout Candy Cane & Bell on Stick -->
+      <div class="puppet-right-enter">
+        <div class="puppet-bob" style="animation-delay: 0.35s;">
+          <svg class="w-36 sm:w-44 h-auto paper-cutout" viewBox="0 0 180 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Wooden Stick -->
+            <rect x="85" y="170" width="10" height="90" rx="4" fill="#92400e"/>
+            <!-- Cream Die-Cut Paper Backing -->
+            <path d="M90 28C65 28 46 47 46 72V148C46 164 60 176 90 176C120 176 134 164 134 148V72C134 47 115 28 90 28Z" fill="#fffdf5" stroke="#f3ead3" stroke-width="8"/>
+            <!-- Gingerbread Cookie Character -->
+            <circle cx="90" cy="68" r="28" fill="#d97706"/>
+            <rect x="64" y="92" width="52" height="64" rx="22" fill="#d97706"/>
+            <!-- White Icing Trim -->
+            <path d="M68 104Q79 112 90 104Q101 112 112 104" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="90" cy="126" r="5" fill="#ef4444"/>
+            <circle cx="90" cy="142" r="5" fill="#22c55e"/>
+            <!-- Smiling Face -->
+            <circle cx="80" cy="63" r="3.5" fill="#0f172a"/>
+            <circle cx="100" cy="63" r="3.5" fill="#0f172a"/>
+            <circle cx="74" cy="71" r="4" fill="#fb7185" opacity="0.6"/>
+            <circle cx="106" cy="71" r="4" fill="#fb7185" opacity="0.6"/>
+            <path d="M80 74C85 80 95 80 100 74" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+            <!-- Red Bowtie -->
+            <polygon points="78,94 90,100 78,106" fill="#ef4444"/>
+            <polygon points="102,94 90,100 102,106" fill="#ef4444"/>
+            <circle cx="90" cy="100" r="4" fill="#b91c1c"/>
+            <!-- Articulated Arms with Brass Brads -->
+            <g class="arm-wave-l">
+              <rect x="26" y="102" width="34" height="16" rx="8" fill="#d97706" stroke="#fffdf5" stroke-width="4"/>
+              <circle cx="56" cy="110" r="5" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+            </g>
+            <g class="arm-wave-r">
+              <rect x="120" y="102" width="34" height="16" rx="8" fill="#d97706" stroke="#fffdf5" stroke-width="4"/>
+              <circle cx="124" cy="110" r="5" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       SCREEN 1: SONG LIBRARY (Clean White List View, No BPM)
+       ========================================================= -->
+  <div id="screen-library" class="relative z-10 min-h-screen flex flex-col bg-transparent view-hidden">
+    <div class="candy-strip"></div>
+    <header class="bg-white border-b-2 border-slate-100 px-6 py-4 flex items-center justify-between sticky top-0 z-20">
+      <div class="flex items-center gap-3">
+        <!-- Cutout Bell Logo -->
+        <div class="w-11 h-11 rounded-2xl bg-[#fffdf5] border-2 border-[#f3ead3] shadow-sm flex items-center justify-center">
+          <svg class="w-7 h-7" viewBox="0 0 64 64" fill="none">
+            <path d="M32 8C29.8 8 28 9.8 28 12V13.4C20.6 15.2 15 21.9 15 30V41L10.5 46.5C9.8 47.4 10.4 48.7 11.5 48.7H52.5C53.6 48.7 54.2 47.4 53.5 46.5L49 41V30C49 21.9 43.4 15.2 36 13.4V12C36 9.8 34.2 8 32 8Z" fill="#E11D48"/>
+            <path d="M26 49C26 52.3 28.7 55 32 55C35.3 55 38 52.3 38 49H26Z" fill="#F59E0B"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="font-game text-2xl font-bold tracking-tight text-slate-900 leading-none">
+            Merry <span class="text-rose-500">Bells</span>
+          </h1>
+          <p class="text-xs font-semibold text-slate-400 mt-0.5">Song Library</p>
+        </div>
+      </div>
+
+      <button id="btn-open-add" class="candy-btn px-4 py-2.5 rounded-2xl bg-gradient-to-b from-emerald-400 to-emerald-600 border-b-4 border-emerald-800 text-white text-xs sm:text-sm font-extrabold shadow-sm flex items-center gap-1.5">
+        <span>+</span>
+        <span>Add Song / MIDI</span>
+      </button>
+    </header>
+
+    <main class="flex-1 max-w-3xl w-full mx-auto px-6 py-8">
+      <div class="bg-white border-2 border-slate-200/90 rounded-3xl shadow-sm overflow-hidden">
+        <div id="library-list" class="divide-y divide-slate-100"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- =========================================================
+       SCREEN 2: PRE-GAME SETUP (Bells, Difficulty, Speed -> Launch)
+       ========================================================= -->
+  <div id="screen-setup" class="relative z-10 min-h-screen flex flex-col bg-transparent view-hidden">
+    <div class="candy-strip"></div>
+    <header class="bg-white border-b-2 border-slate-100 px-6 py-4 flex items-center justify-between">
+      <button id="btn-back-library" class="candy-btn px-4 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 border-b-4 border-slate-300 text-slate-700 text-xs sm:text-sm font-extrabold">
+        ← Song Library
+      </button>
+      <button id="btn-setup-sound" class="candy-btn px-4 py-2 rounded-2xl bg-white border-2 border-slate-200 border-b-4 text-slate-700 text-xs font-extrabold">
+        <span id="setup-sound-label">Practice Sound: ON</span>
+      </button>
+    </header>
+
+    <main class="flex-1 max-w-2xl w-full mx-auto px-6 py-6 flex flex-col justify-center">
+      <div class="text-center mb-6">
+        <h2 id="setup-song-title" class="font-game text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">Jingle Bells</h2>
+      </div>
+
+      <div class="space-y-5 bg-white border-2 border-slate-200/90 rounded-[2rem] p-6 sm:p-7 shadow-lg shadow-slate-200/40">
+        <!-- 1. Number of Bells -->
+        <div>
+          <div class="flex items-center justify-between mb-2.5">
+            <label class="font-game text-sm font-bold text-slate-700">1. Number of Bells</label>
+            <span id="setup-fit-badge" class="text-xs font-bold text-emerald-600">100% in range</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2.5" id="setup-bells-group">
+            <button data-range="8" class="setup-bell-btn candy-btn py-3.5 px-2 rounded-2xl border-2 border-b-4 text-center">
+              <div class="font-game text-lg font-bold">8 Bells</div>
+              <div class="text-[11px] font-semibold opacity-80">Classic Set</div>
+            </button>
+            <button data-range="13" class="setup-bell-btn candy-btn py-3.5 px-2 rounded-2xl border-2 border-b-4 text-center">
+              <div class="font-game text-lg font-bold">13 Bells</div>
+              <div class="text-[11px] font-semibold opacity-80">Chromatic</div>
+            </button>
+            <button data-range="20" class="setup-bell-btn candy-btn py-3.5 px-2 rounded-2xl border-2 border-b-4 text-center">
+              <div class="font-game text-lg font-bold">20 Bells</div>
+              <div class="text-[11px] font-semibold opacity-80">Expanded</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Difficulty -->
+        <div>
+          <label class="block font-game text-sm font-bold text-slate-700 mb-2.5">2. Difficulty</label>
+          <div class="grid grid-cols-3 gap-2.5" id="setup-diff-group">
+            <button data-complexity="simple" class="setup-diff-btn candy-btn py-3.5 px-2 rounded-2xl border-2 border-b-4 text-center">
+              <div class="font-game text-lg font-bold">Easy</div>
+              <div class="text-[11px] font-semibold opacity-80">Simplified</div>
+            </button>
+            <button data-complexity="melody" class="setup-diff-btn candy-btn py-3.5 px-2 rounded-2xl border-2 border-b-4 text-center">
+              <div class="font-game text-lg font-bold">Normal</div>
+              <div class="text-[11px] font-semibold opacity-80">Melody</div>
+            </button>
+            <button data-complexity="harmony" class="setup-diff-btn candy-btn py-3.5 px-2 rounded-2xl border-2 border-b-4 text-center">
+              <div class="font-game text-lg font-bold">Hard</div>
+              <div class="text-[11px] font-semibold opacity-80">Harmony</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Speed -->
+        <div>
+          <label class="block font-game text-sm font-bold text-slate-700 mb-2.5">3. Speed</label>
+          <div class="grid grid-cols-4 gap-2" id="setup-speed-group">
+            <button data-speed="0.5" class="setup-speed-btn candy-btn py-2.5 rounded-2xl border-2 border-b-4 text-sm font-extrabold">0.5x</button>
+            <button data-speed="1"   class="setup-speed-btn candy-btn py-2.5 rounded-2xl border-2 border-b-4 text-sm font-extrabold">1.0x</button>
+            <button data-speed="1.5" class="setup-speed-btn candy-btn py-2.5 rounded-2xl border-2 border-b-4 text-sm font-extrabold">1.5x</button>
+            <button data-speed="2"   class="setup-speed-btn candy-btn py-2.5 rounded-2xl border-2 border-b-4 text-sm font-extrabold">2.0x</button>
+          </div>
+        </div>
+
+
+        <!-- Key Shift -->
+        <div class="pt-3 border-t-2 border-slate-100 flex items-center justify-between gap-4">
+          <span class="text-xs font-extrabold text-slate-500">Key Shift</span>
+          <div class="flex items-center gap-3 flex-1 max-w-[220px]">
+            <input id="setup-transpose" type="range" min="-12" max="12" value="0" class="w-full accent-rose-500 cursor-pointer" />
+            <span id="setup-transpose-val" class="text-xs font-extrabold text-slate-700 w-10 text-right">0 st</span>
+          </div>
+        </div>
+      </div>
+
+      <button id="btn-launch-game" class="candy-btn mt-6 w-full py-4 rounded-3xl bg-gradient-to-b from-rose-400 to-rose-600 border-b-[6px] border-rose-800 text-white font-game text-2xl font-bold tracking-wide shadow-xl shadow-rose-500/25 flex items-center justify-center gap-2.5">
+        <span>▶</span>
+        <span>PLAY SONG!</span>
+      </button>
+    </main>
+  </div>
+
+  <!-- =========================================================
+       SCREEN 3: GAMEPLAY STAGE (White Candy-Cutout Stage)
+       ========================================================= -->
+  <div id="screen-play" class="relative z-10 h-screen flex flex-col bg-transparent view-hidden overflow-hidden">
+    <div class="candy-strip"></div>
+    <header class="px-5 py-2.5 border-b-2 border-slate-100 bg-white flex items-center justify-between gap-3 z-10">
+      <div class="flex items-center gap-2">
+        <button id="btn-exit-play" class="candy-btn px-3.5 py-1.5 rounded-xl bg-slate-100 border-b-4 border-slate-300 text-slate-700 text-xs font-extrabold">
+          ← Menu
+        </button>
+        <button id="btn-play-pause" class="candy-btn px-4 py-1.5 rounded-xl bg-gradient-to-b from-amber-400 to-amber-500 border-b-4 border-amber-700 text-white text-xs font-extrabold shadow-sm">
+          <span id="play-icon">⏸</span> <span id="play-label">Pause</span>
+        </button>
+        <button id="btn-restart" class="candy-btn px-3.5 py-1.5 rounded-xl bg-slate-100 border-b-4 border-slate-300 text-slate-700 text-xs font-extrabold">
+          ↺ Restart
+        </button>
+      </div>
+
+      <div class="text-center hidden sm:block truncate">
+        <span id="hud-title" class="font-game text-lg font-bold text-slate-900">Jingle Bells</span>
+        <span id="hud-meta" class="ml-2 text-xs font-bold text-rose-500">8 Bells · Normal · 1.0x</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span id="hud-time" class="text-xs font-mono font-extrabold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">0:00 / 0:00</span>
+        <button id="btn-play-sound" class="candy-btn px-3 py-1.5 rounded-xl bg-white border-2 border-slate-200 border-b-4 text-xs font-extrabold text-slate-700">
+          <span id="play-sound-label">Sound ON</span>
+        </button>
+        <button id="btn-fullscreen" class="candy-btn px-3.5 py-1.5 rounded-xl bg-gradient-to-b from-sky-400 to-sky-600 border-b-4 border-sky-800 text-white text-xs font-extrabold">
+          TV Mode
+        </button>
+      </div>
+    </header>
+
+    <div id="canvas-container" class="flex-1 relative w-full overflow-hidden bg-white/35 backdrop-blur-[1px]">
+      <canvas id="bell-canvas" class="block w-full h-full"></canvas>
+
+      <div id="countin-overlay" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[2px] hidden">
+        <div id="countin-number" class="font-game text-8xl sm:text-9xl font-bold text-rose-500 drop-shadow-md animate-bounce">3</div>
+      </div>
+    </div>
+
+    <footer class="px-6 py-3 bg-white border-t-2 border-slate-100 text-center z-10">
+      <p id="lyrics-display" class="font-game text-lg sm:text-2xl font-bold text-slate-800 tracking-tight min-h-[30px]">
+        Ring your bell when the circle lands!
+      </p>
+    </footer>
+  </div>
+
+  <!-- =========================================================
+       MODAL: ADD CUSTOM SONG / UPLOAD MIDI OR MUSICXML
+       ========================================================= -->
+  <div id="modal-add" class="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-[2rem] max-w-lg w-full p-6 shadow-2xl border-2 border-slate-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-game text-xl font-bold text-slate-900">Add Song to Library</h3>
+        <button id="btn-close-modal" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm">✕</button>
+      </div>
+
+      <label class="block cursor-pointer border-2 border-dashed border-rose-300 hover:border-rose-500 rounded-2xl p-5 text-center bg-rose-50/40 hover:bg-rose-50 transition">
+        <div class="text-sm font-extrabold text-slate-800">Upload a .mid or .musicxml file</div>
+        <div class="text-xs text-slate-500 mt-0.5">Auto-generates 8, 13 &amp; 20-bell + Easy/Normal/Hard modes</div>
+        <input id="file-upload" type="file" accept=".mid,.midi,.musicxml,.xml" class="hidden" />
+      </label>
+
+      <div class="flex items-center gap-3 text-xs font-bold text-slate-300 uppercase">
+        <div class="flex-1 h-px bg-slate-200"></div>
+        <span>Or type notes</span>
+        <div class="flex-1 h-px bg-slate-200"></div>
+      </div>
+
+      <div class="space-y-3">
+        <input id="modal-title" type="text" placeholder="Song Title" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 text-sm font-semibold focus:outline-none focus:border-rose-500" />
+        <textarea id="modal-notes" rows="3" placeholder="Example: E4:1 E4:1 E4:2 E4:1 E4:1 E4:2" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 text-xs font-mono focus:outline-none focus:border-rose-500"></textarea>
+        <input id="modal-lyrics" type="text" placeholder="Optional lyrics separated by | (e.g. Line one | Line two)" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 text-xs focus:outline-none focus:border-rose-500" />
+        <p id="modal-status" class="text-xs font-bold text-rose-600 min-h-[16px]"></p>
+        <button id="btn-save-modal" class="candy-btn w-full py-3 rounded-2xl bg-gradient-to-b from-emerald-400 to-emerald-600 border-b-4 border-emerald-800 text-white text-sm font-extrabold">
+          Save to Library
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const ALL_BELLS = [
+        { midi: 57, name: 'A3',  label: 'A',   color: '#6366f1', dark: '#4338ca', text: '#ffffff', sharp: false },
+        { midi: 58, name: 'A#3', label: 'A♯',  color: '#475569', dark: '#1e293b', text: '#ffffff', sharp: true  },
+        { midi: 59, name: 'B3',  label: 'B',   color: '#a855f7', dark: '#7e22ce', text: '#ffffff', sharp: false },
+        { midi: 60, name: 'C4',  label: 'C',   color: '#ef4444', dark: '#b91c1c', text: '#ffffff', sharp: false },
+        { midi: 61, name: 'C#4', label: 'C♯',  color: '#475569', dark: '#1e293b', text: '#ffffff', sharp: true  },
+        { midi: 62, name: 'D4',  label: 'D',   color: '#f97316', dark: '#c2410c', text: '#ffffff', sharp: false },
+        { midi: 63, name: 'D#4', label: 'D♯',  color: '#475569', dark: '#1e293b', text: '#ffffff', sharp: true  },
+        { midi: 64, name: 'E4',  label: 'E',   color: '#eab308', dark: '#a16207', text: '#0f172a', sharp: false },
+        { midi: 65, name: 'F4',  label: 'F',   color: '#22c55e', dark: '#15803d', text: '#ffffff', sharp: false },
+        { midi: 66, name: 'F#4', label: 'F♯',  color: '#475569', dark: '#1e293b', text: '#ffffff', sharp: true  },
+        { midi: 67, name: 'G4',  label: 'G',   color: '#0ea5e9', dark: '#0369a1', text: '#ffffff', sharp: false },
+        { midi: 68, name: 'G#4', label: 'G♯',  color: '#475569', dark: '#1e293b', text: '#ffffff', sharp: true  },
+        { midi: 69, name: 'A4',  label: 'A',   color: '#2563eb', dark: '#1e40af', text: '#ffffff', sharp: false },
+        { midi: 70, name: 'A#4', label: 'A♯',  color: '#475569', dark: '#1e293b', text: '#ffffff', sharp: true  },
+        { midi: 71, name: 'B4',  label: 'B',   color: '#9333ea', dark: '#6b21a8', text: '#ffffff', sharp: false },
+        { midi: 72, name: 'C5',  label: 'C⁵',  color: '#f8fafc', dark: '#cbd5e1', text: '#0f172a', sharp: false, border: '#94a3b8' },
+        { midi: 73, name: 'C#5', label: 'C♯⁵', color: '#475569', dark: '#1e293b', text: '#ffffff', sharp: true  },
+        { midi: 74, name: 'D5',  label: 'D⁵',  color: '#fb923c', dark: '#c2410c', text: '#0f172a', sharp: false },
+        { midi: 75, name: 'D#5', label: 'D♯⁵', color: '#475569', dark: '#1e293b', text: '#ffffff', sharp: true  },
+        { midi: 76, name: 'E5',  label: 'E⁵',  color: '#facc15', dark: '#ca8a04', text: '#0f172a', sharp: false }
+      ];
+
+      function getActiveBells(rangeMode) {
+        if (rangeMode === '8') return ALL_BELLS.filter(b => b.midi >= 60 && b.midi <= 72 && !b.sharp);
+        if (rangeMode === '13') return ALL_BELLS.filter(b => b.midi >= 60 && b.midi <= 72);
+        return ALL_BELLS;
+      }
+
+      const NOTE_MAP = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+
+      function noteNameToMidi(str) {
+        const m = String(str).trim().match(/^([A-Ga-g])([#♯b♭]?)(-?\d)$/);
+        if (!m) return null;
+        let semi = NOTE_MAP[m[1].toUpperCase()];
+        if (m[2] === '#' || m[2] === '♯') semi += 1;
+        if (m[2] === 'b' || m[2] === '♭') semi -= 1;
+        return (parseInt(m[3], 10) + 1) * 12 + semi;
+      }
+
+      function parseNoteText(text) {
+        const tokens = text.replace(/\|/g, ' ').trim().split(/\s+/).filter(Boolean);
+        const events = [];
+        let cursor = 0;
+        for (const tok of tokens) {
+          const [pitchPart, durPart] = tok.split(':');
+          const dur = durPart ? Math.max(0.25, parseFloat(durPart) || 1) : 1;
+          if (pitchPart.toUpperCase() !== 'R' && pitchPart !== '-') {
+            for (const p of pitchPart.split('+')) {
+              const midi = noteNameToMidi(p);
+              if (midi !== null) events.push({ midi, beat: cursor, dur });
+            }
+          }
+          cursor += dur;
+        }
+        return events;
+      }
+
+      const DEFAULT_SONGS = [
+        {
+          id: 'jingle-bells',
+          title: 'Jingle Bells',
+          tag: 'Christmas',
+          bpm: 132,
+          rangeMode: '8',
+          complexity: 'melody',
+          transpose: 0,
+          melodyText:
+            'E4:1 E4:1 E4:2 E4:1 E4:1 E4:2 E4:1 G4:1 C4:1.5 D4:0.5 E4:4 ' +
+            'F4:1 F4:1 F4:1.5 F4:0.5 F4:1 E4:1 E4:1 E4:0.5 E4:0.5 E4:1 D4:1 D4:1 E4:1 D4:2 G4:2 ' +
+            'E4:1 E4:1 E4:2 E4:1 E4:1 E4:2 E4:1 G4:1 C4:1.5 D4:0.5 E4:4 ' +
+            'F4:1 F4:1 F4:1.5 F4:0.5 F4:1 E4:1 E4:1 E4:0.5 E4:0.5 G4:1 G4:1 F4:1 D4:1 C4:4',
+          harmonyText:
+            'C4+E4:1 E4:1 C4+E4:2 C4+E4:1 E4:1 C4+E4:2 C4+E4:1 G4:1 C4:1.5 D4:0.5 C4+E4:4 ' +
+            'F4+A4:1 F4:1 F4+A4:1.5 F4:0.5 F4:1 C4+E4:1 E4:1 E4:0.5 E4:0.5 D4+F#4:1 D4:1 D4:1 E4:1 D4+G4:2 G4:2 ' +
+            'C4+E4:1 E4:1 C4+E4:2 C4+E4:1 E4:1 C4+E4:2 C4+E4:1 G4:1 C4:1.5 D4:0.5 C4+E4:4 ' +
+            'F4+A4:1 F4:1 F4+A4:1.5 F4:0.5 F4:1 C4+E4:1 E4:1 E4:0.5 E4:0.5 G4+B4:1 G4:1 F4+G4:1 D4:1 C4+E4+G4:4',
+          lyrics: [
+            { beat: 0,  text: 'Jingle bells, jingle bells, jingle all the way!' },
+            { beat: 16, text: 'Oh what fun it is to ride in a one-horse open sleigh, hey!' },
+            { beat: 32, text: 'Jingle bells, jingle bells, jingle all the way!' },
+            { beat: 48, text: 'Oh what fun it is to ride in a one-horse open sleigh!' }
+          ]
+        },
+        {
+          id: 'silent-night',
+          title: 'Silent Night',
+          tag: 'Christmas',
+          bpm: 84,
+          rangeMode: '8',
+          complexity: 'melody',
+          transpose: 0,
+          melodyText:
+            'G4:1.5 A4:0.5 G4:1 E4:3 G4:1.5 A4:0.5 G4:1 E4:3 ' +
+            'D5:2 D5:1 B4:3 C5:2 C5:1 G4:3 ' +
+            'A4:2 A4:1 C5:1.5 B4:0.5 A4:1 G4:1.5 A4:0.5 G4:1 E4:3 ' +
+            'D5:2 D5:1 F5:1.5 D5:0.5 B4:1 C5:3 E5:3 C5:1 G4:1 E4:1 G4:1.5 F4:0.5 D4:1 C4:4',
+          harmonyText:
+            'C4+G4:1.5 A4:0.5 G4:1 C4+E4:3 C4+G4:1.5 A4:0.5 G4:1 C4+E4:3 ' +
+            'G4+D5:2 D5:1 G4+B4:3 C4+C5:2 C5:1 C4+G4:3 ' +
+            'F4+A4:2 A4:1 C5:1.5 B4:0.5 A4:1 C4+G4:1.5 A4:0.5 G4:1 C4+E4:3 ' +
+            'G4+D5:2 D5:1 F5:1.5 D5:0.5 B4:1 C4+C5:3 E5:3 C5:1 G4:1 E4:1 G4:1.5 F4:0.5 D4:1 C4+E4+G4:4',
+          lyrics: [
+            { beat: 0,  text: 'Silent night, holy night!' },
+            { beat: 6,  text: 'All is calm, all is bright' },
+            { beat: 12, text: 'Round yon virgin, mother and child' },
+            { beat: 24, text: 'Sleep in heavenly peace' }
+          ]
+        },
+        {
+          id: 'ode-to-joy',
+          title: 'Ode to Joy',
+          tag: 'Classic',
+          bpm: 112,
+          rangeMode: '8',
+          complexity: 'melody',
+          transpose: 0,
+          melodyText:
+            'E4:1 E4:1 F4:1 G4:1 G4:1 F4:1 E4:1 D4:1 C4:1 C4:1 D4:1 E4:1 E4:1.5 D4:0.5 D4:2 ' +
+            'E4:1 E4:1 F4:1 G4:1 G4:1 F4:1 E4:1 D4:1 C4:1 C4:1 D4:1 E4:1 D4:1.5 C4:0.5 C4:2',
+          harmonyText:
+            'C4+E4:1 E4:1 F4:1 C4+G4:1 G4:1 F4:1 C4+E4:1 D4:1 C4+E4:1 C4:1 G3+D4:1 E4:1 C4+E4:1.5 D4:0.5 G3+D4:2 ' +
+            'C4+E4:1 E4:1 F4:1 C4+G4:1 G4:1 F4:1 C4+E4:1 D4:1 C4+E4:1 C4:1 G3+D4:1 E4:1 G3+D4:1.5 C4:0.5 C4+E4+G4:2',
+          lyrics: [
+            { beat: 0,  text: 'Joyful, joyful, we adore Thee, God of glory, Lord of love' },
+            { beat: 16, text: 'Hearts unfold like flowers before Thee, opening to the sun above' }
+          ]
+        },
+        {
+          id: 'amazing-grace',
+          title: 'Amazing Grace',
+          tag: 'Hymn',
+          bpm: 88,
+          rangeMode: '20',
+          complexity: 'melody',
+          transpose: 0,
+          melodyText:
+            'G3:1 C4:2 E4:0.5 C4:0.5 E4:2 D4:1 C4:2 A3:1 G3:2 ' +
+            'G3:1 C4:2 E4:0.5 C4:0.5 E4:2 D4:1 G4:3 R:1 ' +
+            'E4:1 G4:2 E4:0.5 C4:0.5 E4:2 D4:1 C4:2 A3:1 G3:2 ' +
+            'G3:1 C4:2 E4:0.5 C4:0.5 E4:2 D4:1 C4:3',
+          harmonyText:
+            'G3:1 C4+E4:2 E4:0.5 C4:0.5 C4+E4:2 D4:1 C4+E4:2 A3:1 G3+B3:2 ' +
+            'G3:1 C4+E4:2 E4:0.5 C4:0.5 C4+E4:2 D4:1 G4+B4:3 R:1 ' +
+            'E4:1 C4+G4:2 E4:0.5 C4:0.5 C4+E4:2 D4:1 F4+A4:2 A3:1 G3+B3:2 ' +
+            'G3:1 C4+E4:2 E4:0.5 C4:0.5 G3+E4:2 D4:1 C4+E4+G4:3',
+          lyrics: [
+            { beat: 0,  text: 'Amazing grace, how sweet the sound' },
+            { beat: 12, text: 'That saved a wretch like me' },
+            { beat: 25, text: 'I once was lost, but now am found' },
+            { beat: 37, text: 'Was blind, but now I see' }
+          ]
+        }
+      ];
+
+      function extractTopLine(notes) {
+        const sorted = [...notes].sort((a, b) => a.beat - b.beat || b.midi - a.midi);
+        const melody = [];
+        let lastBeat = -1;
+        for (const n of sorted) {
+          if (Math.abs(n.beat - lastBeat) > 0.08) {
+            melody.push({ midi: n.midi, beat: n.beat, dur: n.dur });
+            lastBeat = n.beat;
+          }
+        }
+        return melody;
+      }
+
+      function parseMidiFile(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let pos = 0;
+        const readStr = (n) => { let s = ''; for (let i = 0; i < n && pos < bytes.length; i++) s += String.fromCharCode(bytes[pos++]); return s; };
+        const read32 = () => ((bytes[pos++] << 24) | (bytes[pos++] << 16) | (bytes[pos++] << 8) | bytes[pos++]) >>> 0;
+        const read16 = () => (bytes[pos++] << 8) | bytes[pos++];
+        const readVar = () => { let v = 0; while (pos < bytes.length) { const b = bytes[pos++]; v = (v << 7) | (b & 0x7f); if (!(b & 0x80)) break; } return v; };
+
+        if (readStr(4) !== 'MThd') throw new Error('Invalid MIDI file');
+        const headerLen = read32();
+        read16();
+        const numTracks = read16();
+        const division = read16();
+        pos = 8 + headerLen;
+
+        const ticksPerBeat = (division & 0x8000) ? 480 : division;
+        let bpm = 120;
+        const rawNotes = [];
+
+        for (let t = 0; t < numTracks && pos < bytes.length; t++) {
+          const chunkId = readStr(4);
+          const chunkLen = read32();
+          const trackEnd = pos + chunkLen;
+          if (chunkId !== 'MTrk') { pos = trackEnd; continue; }
+
+          let tick = 0, runningStatus = 0;
+          const active = new Map();
+
+          while (pos < trackEnd) {
+            tick += readVar();
+            let status = bytes[pos];
+            if (status < 0x80) status = runningStatus;
+            else { pos++; if (status < 0xf0) runningStatus = status; }
+
+            if (status === 0xff) {
+              const meta = bytes[pos++];
+              const len = readVar();
+              if (meta === 0x51 && len === 3) {
+                const us = (bytes[pos] << 16) | (bytes[pos + 1] << 8) | bytes[pos + 2];
+                if (us > 0) bpm = Math.round(60000000 / us);
+              }
+              pos += len;
+            } else if (status === 0xf0 || status === 0xf7) {
+              pos += readVar();
+            } else {
+              const type = status & 0xf0, ch = status & 0x0f;
+              const d1 = bytes[pos++], d2 = (type === 0xc0 || type === 0xd0) ? 0 : bytes[pos++];
+              if (ch === 9) continue;
+              if (type === 0x90 && d2 > 0) active.set(`${ch}:${d1}`, tick);
+              else if (type === 0x80 || (type === 0x90 && d2 === 0)) {
+                const key = `${ch}:${d1}`;
+                if (active.has(key)) {
+                  const startTick = active.get(key);
+                  active.delete(key);
+                  rawNotes.push({ midi: d1, beat: startTick / ticksPerBeat, dur: Math.max(0.25, (tick - startTick) / ticksPerBeat) });
+                }
+              }
+            }
+          }
+          pos = trackEnd;
+        }
+
+        rawNotes.sort((a, b) => a.beat - b.beat || b.midi - a.midi);
+        const firstBeat = rawNotes.length ? rawNotes[0].beat : 0;
+        const normalized = rawNotes.map(n => ({
+          midi: n.midi,
+          beat: Number((n.beat - firstBeat).toFixed(3)),
+          dur: Number(Math.min(4, n.dur).toFixed(3))
+        }));
+        return { bpm, melodyEvents: extractTopLine(normalized), harmonyEvents: normalized };
+      }
+
+      function parseMusicXml(xmlText) {
+        const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+        const tempoEl = doc.querySelector('sound[tempo]');
+        const bpm = tempoEl ? Math.round(parseFloat(tempoEl.getAttribute('tempo')) || 120) : 120;
+        const titleEl = doc.querySelector('work-title, movement-title');
+        const title = titleEl ? titleEl.textContent.trim() : '';
+
+        const allNotes = [];
+        doc.querySelectorAll('part').forEach(part => {
+          let divisions = 1, cursorBeats = 0, lastNoteStart = 0;
+          part.querySelectorAll('measure').forEach(measure => {
+            const divEl = measure.querySelector('attributes > divisions');
+            if (divEl) divisions = Math.max(1, parseInt(divEl.textContent, 10) || 1);
+            measure.childNodes.forEach(node => {
+              if (node.nodeName === 'backup') {
+                cursorBeats = Math.max(0, cursorBeats - parseInt(node.querySelector('duration')?.textContent || '0', 10) / divisions);
+              } else if (node.nodeName === 'forward') {
+                cursorBeats += parseInt(node.querySelector('duration')?.textContent || '0', 10) / divisions;
+              } else if (node.nodeName === 'note') {
+                const isChord = !!node.querySelector('chord');
+                const isRest = !!node.querySelector('rest');
+                const durBeats = Math.max(0.25, parseInt(node.querySelector('duration')?.textContent || '1', 10) / divisions);
+                const startBeat = isChord ? lastNoteStart : cursorBeats;
+                if (!isRest) {
+                  const step = node.querySelector('pitch > step')?.textContent?.trim();
+                  const alter = parseInt(node.querySelector('pitch > alter')?.textContent || '0', 10);
+                  const oct = parseInt(node.querySelector('pitch > octave')?.textContent || '4', 10);
+                  if (step && NOTE_MAP[step] !== undefined) {
+                    allNotes.push({ midi: (oct + 1) * 12 + NOTE_MAP[step] + alter, beat: Number(startBeat.toFixed(3)), dur: Number(Math.min(4, durBeats).toFixed(3)) });
+                  }
+                }
+                if (!isChord) { lastNoteStart = cursorBeats; cursorBeats += durBeats; }
+              }
+            });
+          });
+        });
+
+        allNotes.sort((a, b) => a.beat - b.beat || b.midi - a.midi);
+        return { title, bpm, melodyEvents: extractTopLine(allNotes), harmonyEvents: allNotes };
+      }
+
+      let audioCtx = null;
+      function ensureAudio() {
+        if (!audioCtx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) audioCtx = new AC();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+      }
+
+      function playBellSound(midi) {
+        if (!state.soundOn) return;
+        ensureAudio();
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const freq = 440 * Math.pow(2, (midi - 69) / 12);
+
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const gain2 = audioCtx.createGain();
+
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(freq, now);
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(freq * 2, now);
+
+        gain2.gain.setValueAtTime(0.16, now);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.28, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0008, now + 1.35);
+
+        osc1.connect(gain);
+        osc2.connect(gain2);
+        gain2.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc1.start(now); osc2.start(now);
+        osc1.stop(now + 1.4); osc2.stop(now + 0.5);
+      }
+
+      const STORAGE_KEY = 'merry_bells_paper_v4';
+      let songs = [];
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) songs = JSON.parse(saved);
+      } catch (_) {}
+      if (!Array.isArray(songs) || songs.length === 0) {
+        songs = JSON.parse(JSON.stringify(DEFAULT_SONGS));
+      }
+
+      const state = {
+        screen: 'library',
+        currentSongId: songs[0].id,
+        soundOn: true,
+        speed: 1,
+        isPlaying: false,
+        countInRemaining: 0,
+        songTime: 0,
+        lastFrameTs: 0,
+        triggeredIds: new Set(),
+        laneFlash: new Map(),
+        particles: [],
+        popups: [],
+        bgFlakes: Array.from({ length: 18 }, () => ({
+          x: Math.random(),
+          y: Math.random(),
+          r: 2 + Math.random() * 3,
+          sp: 0.03 + Math.random() * 0.05
+        }))
+      };
+
+      const PRAISE_WORDS = ['DING!', 'SWEET!', 'MERRY!', 'JOY!'];
+
+      function saveSongs() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(songs)); } catch (_) {}
+      }
+
+      function getCurrentSong() {
+        return songs.find(s => s.id === state.currentSongId) || songs[0];
+      }
+
+      function showScreen(name) {
+        state.screen = name;
+        ['library', 'setup', 'play'].forEach(s => {
+          document.getElementById(`screen-${s}`).classList.toggle('view-hidden', s !== name);
+        });
+        if (name === 'library') renderLibrary();
+        if (name === 'setup') renderSetup();
+        if (name === 'play') setTimeout(resizeCanvas, 30);
+      }
+
+      function compileSong(song) {
+        const activeBells = getActiveBells(song.rangeMode || '8');
+        const activeSet = new Set(activeBells.map(b => b.midi));
+        const minMidi = activeBells[0].midi;
+        const maxMidi = activeBells[activeBells.length - 1].midi;
+
+        let raw = (song.complexity === 'harmony')
+          ? (song.harmonyEvents || parseNoteText(song.harmonyText || song.melodyText))
+          : (song.melodyEvents || parseNoteText(song.melodyText));
+
+        if (song.complexity === 'simple') {
+          const simplified = [];
+          let lastBeat = -99;
+          for (const n of raw) {
+            const qBeat = Math.round(n.beat * 2) / 2;
+            if (qBeat - lastBeat >= 0.5) {
+              simplified.push({ midi: n.midi, beat: qBeat, dur: Math.max(0.5, n.dur) });
+              lastBeat = qBeat;
+            }
+          }
+          raw = simplified;
+        }
+
+        const secPerBeat = 60 / (song.bpm || 120);
+        let autoFittedCount = 0;
+        const compiled = raw.map((n, idx) => {
+          let m = n.midi + (song.transpose || 0);
+          while (m < minMidi) { m += 12; autoFittedCount++; }
+          while (m > maxMidi) { m -= 12; autoFittedCount++; }
+          if (!activeSet.has(m)) {
+            autoFittedCount++;
+            const cands = activeBells.map(b => b.midi);
+            m = cands.reduce((best, c) => Math.abs(c - m) < Math.abs(best - m) ? c : best, cands[0]);
+          }
+          return { id: idx, midi: m, startSec: n.beat * secPerBeat, durSec: Math.max(0.2, n.dur * secPerBeat) };
+        });
+
+        const totalSec = compiled.length ? Math.max(...compiled.map(c => c.startSec + c.durSec)) + 1.5 : 5;
+        return { compiled, totalSec, autoFittedCount, activeBells };
+      }
+
+      let cachedCompiled = compileSong(getCurrentSong());
+
+      // =========================================================
+      // SPLASH SCREEN (Paper snowflakes + Cutout Puppets)
+      // =========================================================
+      function initSplash() {
+        const snowLayer = document.getElementById('snow-layer');
+        const colors = ['#bae6fd', '#fecdd3', '#bbf7d0', '#fde68a'];
+        for (let i = 0; i < 20; i++) {
+          const fl = document.createElement('div');
+          fl.className = 'paper-flake rounded-full';
+          const sz = 8 + Math.random() * 10;
+          fl.style.width = `${sz}px`;
+          fl.style.height = `${sz}px`;
+          fl.style.backgroundColor = colors[i % colors.length];
+          fl.style.border = '2px solid #fffdf5';
+          fl.style.boxShadow = '0 2px 4px rgba(15,23,42,0.1)';
+          fl.style.left = `${Math.random() * 100}%`;
+          fl.style.animationDuration = `${3.2 + Math.random() * 3.5}s`;
+          fl.style.animationDelay = `${Math.random() * 1.2}s`;
+          snowLayer.appendChild(fl);
+        }
+
+        const splash = document.getElementById('splash-screen');
+        let dismissed = false;
+        function dismissSplash() {
+          if (dismissed) return;
+          dismissed = true;
+          splash.classList.add('opacity-0');
+          showScreen('library');
+          setTimeout(() => splash.classList.add('view-hidden'), 700);
+        }
+        splash.addEventListener('click', dismissSplash);
+        setTimeout(dismissSplash, 2500);
+      }
+
+      // =========================================================
+      // SCREEN 1: CLEAN LIST VIEW (NO BPM, NO EMOJI ICONS)
+      // =========================================================
+      function renderLibrary() {
+        const list = document.getElementById('library-list');
+        list.innerHTML = '';
+        songs.forEach((s) => {
+          const row = document.createElement('div');
+          row.className = 'px-5 py-4 hover:bg-rose-50/40 transition cursor-pointer flex items-center justify-between gap-4';
+          row.innerHTML = `
+            <div class="min-w-0 flex items-center gap-3.5">
+              <span class="font-game text-lg font-bold text-slate-900 truncate">${s.title}</span>
+            </div>
+            <button class="candy-btn px-4 py-2 rounded-xl bg-gradient-to-b from-rose-400 to-rose-600 border-b-4 border-rose-800 text-white text-xs font-extrabold shrink-0">
+              Select →
+            </button>
+          `;
+          row.addEventListener('click', () => {
+            state.currentSongId = s.id;
+            showScreen('setup');
+          });
+          list.appendChild(row);
+        });
+      }
+
+      // =========================================================
+      // SCREEN 2: PRE-GAME SETUP (NO BPM)
+      // =========================================================
+      function renderSetup() {
+        const song = getCurrentSong();
+        cachedCompiled = compileSong(song);
+
+        document.getElementById('setup-song-title').textContent = song.title;
+
+        const fitBadge = document.getElementById('setup-fit-badge');
+        if (cachedCompiled.autoFittedCount === 0) {
+          fitBadge.textContent = '100% in range';
+          fitBadge.className = 'text-xs font-bold text-emerald-600';
+        } else {
+          fitBadge.textContent = `${cachedCompiled.autoFittedCount} notes auto-fitted`;
+          fitBadge.className = 'text-xs font-bold text-amber-600';
+        }
+
+        document.querySelectorAll('.setup-bell-btn').forEach(btn => {
+          const active = btn.dataset.range === (song.rangeMode || '8');
+          btn.className = active
+            ? 'setup-bell-btn candy-btn py-3.5 px-2 rounded-2xl border-2 border-b-4 border-rose-600 bg-rose-500 text-white text-center shadow-md'
+            : 'setup-bell-btn candy-btn py-3.5 px-2 rounded-2xl border-2 border-b-4 border-slate-200 bg-white text-slate-600 hover:border-slate-300 text-center';
+        });
+
+        document.querySelectorAll('.setup-diff-btn').forEach(btn => {
+          const active = btn.dataset.complexity === (song.complexity || 'melody');
+          btn.className = active
+            ? 'setup-diff-btn candy-btn py-3.5 px-2 rounded-2xl border-2 border-b-4 border-emerald-700 bg-emerald-500 text-white text-center shadow-md'
+            : 'setup-diff-btn candy-btn py-3.5 px-2 rounded-2xl border-2 border-b-4 border-slate-200 bg-white text-slate-600 hover:border-slate-300 text-center';
+        });
+
+        document.querySelectorAll('.setup-speed-btn').forEach(btn => {
+          const active = parseFloat(btn.dataset.speed) === state.speed;
+          btn.className = active
+            ? 'setup-speed-btn candy-btn py-2.5 rounded-2xl border-2 border-b-4 border-sky-700 bg-sky-500 text-white text-sm font-extrabold shadow-md'
+            : 'setup-speed-btn candy-btn py-2.5 rounded-2xl border-2 border-b-4 border-slate-200 bg-white text-slate-600 hover:border-slate-300 text-sm font-extrabold';
+        });
+
+        document.getElementById('setup-transpose').value = song.transpose || 0;
+        document.getElementById('setup-transpose-val').textContent = `${song.transpose > 0 ? '+' : ''}${song.transpose || 0} st`;
+        updateSoundButtons();
+      }
+
+      function updateSoundButtons() {
+        document.getElementById('setup-sound-label').textContent = state.soundOn ? 'Practice Sound: ON' : 'Room Mode: MUTED';
+        document.getElementById('play-sound-label').textContent = state.soundOn ? 'Sound ON' : 'Muted';
+      }
+
+      // =========================================================
+      // SCREEN 3: GAMEPLAY ENGINE & PARTICLES
+      // =========================================================
+      const canvas = document.getElementById('bell-canvas');
+      const ctx = canvas.getContext('2d');
+      const canvasContainer = document.getElementById('canvas-container');
+
+      function formatTime(sec) {
+        const s = Math.max(0, Math.floor(sec));
+        return `${Math.floor(s / 60)}:${(s % 60) < 10 ? '0' : ''}${s % 60}`;
+      }
+
+      function resizeCanvas() {
+        if (state.screen !== 'play') return;
+        const rect = canvasContainer.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.max(300, Math.floor(rect.width * dpr));
+        canvas.height = Math.max(240, Math.floor(rect.height * dpr));
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function spawnHitJuice(laneIdx, totalLanes, bell, w, playlineY) {
+        const laneW = w / totalLanes;
+        const cx = laneIdx * laneW + laneW / 2;
+        const colors = [bell.color, '#fde047', '#ef4444', '#22c55e', '#38bdf8'];
+        for (let i = 0; i < 12; i++) {
+          const angle = -Math.PI * Math.random();
+          const spd = 90 + Math.random() * 190;
+          state.particles.push({
+            x: cx + (Math.random() - 0.5) * (laneW * 0.4),
+            y: playlineY,
+            vx: Math.cos(angle) * spd,
+            vy: Math.sin(angle) * spd - 40,
+            r: 4 + Math.random() * 5,
+            color: colors[i % colors.length],
+            life: 1.0,
+            star: i % 2 === 0
+          });
+        }
+        if (Math.random() < 0.45) {
+          state.popups.push({
+            x: cx,
+            y: playlineY - 24,
+            text: PRAISE_WORDS[Math.floor(Math.random() * PRAISE_WORDS.length)],
+            color: bell.dark || '#e11d48',
+            life: 1.0
+          });
+        }
+      }
+
+      function launchSong() {
+        ensureAudio();
+        const song = getCurrentSong();
+        cachedCompiled = compileSong(song);
+
+        const diffLabel = song.complexity === 'simple' ? 'Easy' : song.complexity === 'harmony' ? 'Hard' : 'Normal';
+        document.getElementById('hud-title').textContent = song.title;
+        document.getElementById('hud-meta').textContent = `${song.rangeMode} Bells · ${diffLabel} · ${state.speed}x`;
+
+        state.songTime = 0;
+        state.triggeredIds.clear();
+        state.particles = [];
+        state.popups = [];
+        state.countInRemaining = 2.4;
+        state.isPlaying = true;
+        state.lastFrameTs = performance.now();
+
+        document.getElementById('countin-overlay').classList.remove('hidden');
+        document.getElementById('play-icon').textContent = '⏸';
+        document.getElementById('play-label').textContent = 'Pause';
+        showScreen('play');
+      }
+
+      function togglePause() {
+        state.isPlaying = !state.isPlaying;
+        if (state.isPlaying) {
+          ensureAudio();
+          state.lastFrameTs = performance.now();
+          if (state.songTime >= cachedCompiled.totalSec) {
+            state.songTime = 0;
+            state.triggeredIds.clear();
+          }
+          document.getElementById('play-icon').textContent = '⏸';
+          document.getElementById('play-label').textContent = 'Pause';
+        } else {
+          document.getElementById('play-icon').textContent = '▶';
+          document.getElementById('play-label').textContent = 'Play';
+        }
+      }
+
+      function drawStar(x, y, r, color, alpha) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, alpha);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const a1 = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+          const a2 = a1 + Math.PI / 5;
+          ctx.lineTo(x + Math.cos(a1) * r, y + Math.sin(a1) * r);
+          ctx.lineTo(x + Math.cos(a2) * (r * 0.45), y + Math.sin(a2) * (r * 0.45));
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawFrame(now) {
+        const dt = Math.min(0.05, (now - (state.lastFrameTs || now)) / 1000);
+        state.lastFrameTs = now;
+
+        if (state.screen === 'play') {
+          if (state.isPlaying) {
+            if (state.countInRemaining > 0) {
+              state.countInRemaining -= dt;
+              document.getElementById('countin-number').textContent = Math.max(1, Math.ceil(state.countInRemaining / 0.8));
+              if (state.countInRemaining <= 0) {
+                document.getElementById('countin-overlay').classList.add('hidden');
+              }
+            } else {
+              state.songTime += dt * state.speed;
+              if (state.songTime >= cachedCompiled.totalSec) {
+                state.isPlaying = false;
+                document.getElementById('play-icon').textContent = '▶';
+                document.getElementById('play-label').textContent = 'Replay';
+              }
+            }
+          }
+
+          document.getElementById('hud-time').textContent = `${formatTime(state.songTime)} / ${formatTime(cachedCompiled.totalSec)}`;
+
+          for (const [m, v] of state.laneFlash.entries()) {
+            const next = v - dt * 3.8;
+            if (next <= 0) state.laneFlash.delete(m);
+            else state.laneFlash.set(m, next);
+          }
+
+          const w = canvasContainer.clientWidth;
+          const h = canvasContainer.clientHeight;
+          const bellZoneH = Math.max(74, Math.min(102, h * 0.17));
+          const playlineY = h - bellZoneH;
+          const { compiled, activeBells } = cachedCompiled;
+          const midiToLane = new Map(activeBells.map((b, idx) => [b.midi, idx]));
+
+          if (state.isPlaying && state.countInRemaining <= 0) {
+            for (const n of compiled) {
+              if (!state.triggeredIds.has(n.id) && n.startSec <= state.songTime && n.startSec >= state.songTime - 0.15) {
+                state.triggeredIds.add(n.id);
+                state.laneFlash.set(n.midi, 1.0);
+                playBellSound(n.midi);
+                const lIdx = midiToLane.get(n.midi);
+                if (lIdx !== undefined) spawnHitJuice(lIdx, activeBells.length, activeBells[lIdx], w, playlineY);
+              }
+            }
+          }
+
+          const song = getCurrentSong();
+          const secPerBeat = 60 / (song.bpm || 120);
+          const curBeat = state.songTime / secPerBeat;
+          if (song.lyrics && song.lyrics.length) {
+            let line = song.lyrics[0].text;
+            for (const l of song.lyrics) {
+              if (curBeat >= l.beat - 0.5) line = l.text;
+            }
+            document.getElementById('lyrics-display').textContent = line;
+          } else {
+            document.getElementById('lyrics-display').textContent = `${song.title} — Ring when the bar hits the line!`;
+          }
+
+          ctx.clearRect(0, 0, w, h);
+          const count = activeBells.length;
+          const laneW = w / count;
+          const lookaheadSec = 2.8 / state.speed;
+          const pxPerSec = (playlineY + bellZoneH / 2) / lookaheadSec;
+
+          activeBells.forEach((bell, i) => {
+            const x = i * laneW;
+            const flash = state.laneFlash.get(bell.midi) || 0;
+            ctx.fillStyle = bell.sharp ? 'rgba(241, 245, 249, 0.55)' : (i % 2 === 0 ? 'rgba(255, 255, 255, 0.48)' : 'rgba(248, 250, 252, 0.36)');
+            ctx.fillRect(x, 0, laneW, playlineY);
+
+            if (flash > 0) {
+              const grad = ctx.createLinearGradient(0, playlineY - 150, 0, playlineY);
+              grad.addColorStop(0, 'rgba(255,255,255,0)');
+              grad.addColorStop(1, (bell.border ? '#94a3b8' : bell.color) + Math.round(flash * 75).toString(16).padStart(2, '0'));
+              ctx.fillStyle = grad;
+              ctx.fillRect(x, playlineY - 150, laneW, 150);
+            }
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+          });
+
+          ctx.fillStyle = 'rgba(186, 230, 253, 0.55)';
+          for (const fl of state.bgFlakes) {
+            fl.y += fl.sp * dt;
+            if (fl.y > 1) { fl.y = -0.02; fl.x = Math.random(); }
+            ctx.beginPath();
+            ctx.arc(fl.x * w, fl.y * playlineY, fl.r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          const targetR = Math.max(13, Math.min(30, laneW * 0.38, (bellZoneH - 16) / 2));
+          const noteR = targetR;
+          const targetCenterY = playlineY + bellZoneH / 2;
+
+          // Subtle horizontal target line through the bell circles
+          ctx.strokeStyle = '#fecdd3';
+          ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(0, targetCenterY); ctx.lineTo(w, targetCenterY); ctx.stroke();
+
+          function drawNoteShape(cx, cy, r, bell, isFlashing) {
+            // Gold hanging loop + cap (Ornament)
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = Math.max(2, r * 0.1);
+            ctx.beginPath(); ctx.arc(cx, cy - r * 1.12, r * 0.2, 0, Math.PI * 2); ctx.stroke();
+
+            ctx.fillStyle = '#fbbf24';
+            ctx.strokeStyle = '#d97706';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.roundRect(cx - r * 0.28, cy - r * 1.05, r * 0.56, r * 0.28, 3);
+            ctx.fill(); ctx.stroke();
+
+            const bodyR = r;
+
+            // 3D bottom shadow
+            ctx.fillStyle = bell.dark;
+            ctx.beginPath(); ctx.arc(cx, cy + 3, bodyR, 0, Math.PI * 2); ctx.fill();
+
+            // Main colored body
+            ctx.fillStyle = bell.color;
+            ctx.beginPath(); ctx.arc(cx, cy, bodyR, 0, Math.PI * 2); ctx.fill();
+
+            ctx.strokeStyle = isFlashing ? '#0f172a' : (bell.border || '#ffffff');
+            ctx.lineWidth = isFlashing ? 3.5 : 2.2;
+            ctx.stroke();
+
+            // Glossy top shine
+            ctx.fillStyle = 'rgba(255,255,255,0.42)';
+            ctx.beginPath();
+            ctx.ellipse(cx - bodyR * 0.2, cy - bodyR * 0.38, bodyR * 0.44, bodyR * 0.2, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Center note label
+            if (bodyR >= 10) {
+              ctx.fillStyle = bell.text;
+              ctx.font = `700 ${Math.min(18, Math.max(10, Math.floor(bodyR * 0.86)))}px Fredoka, Inter, sans-serif`;
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillText(bell.label, cx, cy + 1);
+            }
+          }
+
+          // Draw Target Bell Shapes first
+          activeBells.forEach((bell, i) => {
+            const flash = state.laneFlash.get(bell.midi) || 0;
+            const scale = flash > 0 ? 1 + Math.sin(flash * Math.PI) * 0.14 : 1;
+            const cx = i * laneW + laneW / 2;
+            drawNoteShape(cx, targetCenterY, targetR * scale, bell, flash > 0);
+          });
+
+          // Draw Falling Note Shapes (same size, never fall below targetCenterY)
+          for (const n of compiled) {
+            const laneIdx = midiToLane.get(n.midi);
+            if (laneIdx === undefined) continue;
+            const bell = activeBells[laneIdx];
+            const cy = targetCenterY - (n.startSec - state.songTime) * pxPerSec;
+            if (cy < -noteR - 14 || cy > targetCenterY) continue;
+            const cx = laneIdx * laneW + laneW / 2;
+            drawNoteShape(cx, cy, noteR, bell, false);
+          }
+
+          for (let i = state.particles.length - 1; i >= 0; i--) {
+            const p = state.particles[i];
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.vy += 380 * dt;
+            p.life -= dt * 1.9;
+            if (p.life <= 0) { state.particles.splice(i, 1); continue; }
+            if (p.star) {
+              drawStar(p.x, p.y, p.r * 1.3, p.color, p.life);
+            } else {
+              ctx.save();
+              ctx.globalAlpha = Math.max(0, p.life);
+              ctx.fillStyle = p.color;
+              ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+              ctx.restore();
+            }
+          }
+
+          for (let i = state.popups.length - 1; i >= 0; i--) {
+            const pop = state.popups[i];
+            pop.y -= 48 * dt;
+            pop.life -= dt * 1.6;
+            if (pop.life <= 0) { state.popups.splice(i, 1); continue; }
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, pop.life);
+            ctx.font = '700 18px Fredoka, Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.strokeText(pop.text, pop.x, pop.y);
+            ctx.fillStyle = pop.color;
+            ctx.fillText(pop.text, pop.x, pop.y);
+            ctx.restore();
+          }
+        }
+
+        requestAnimationFrame(drawFrame);
+      }
+
+      document.getElementById('btn-back-library').addEventListener('click', () => showScreen('library'));
+      document.getElementById('btn-launch-game').addEventListener('click', launchSong);
+      document.getElementById('btn-exit-play').addEventListener('click', () => {
+        state.isPlaying = false;
+        showScreen('setup');
+      });
+      document.getElementById('btn-play-pause').addEventListener('click', togglePause);
+      document.getElementById('btn-restart').addEventListener('click', launchSong);
+
+      function toggleSound() {
+        state.soundOn = !state.soundOn;
+        updateSoundButtons();
+      }
+      document.getElementById('btn-setup-sound').addEventListener('click', toggleSound);
+      document.getElementById('btn-play-sound').addEventListener('click', toggleSound);
+
+      document.getElementById('btn-fullscreen').addEventListener('click', () => {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else if (document.fullscreenElement && document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+
+      document.getElementById('setup-bells-group').addEventListener('click', (e) => {
+        const btn = e.target.closest('.setup-bell-btn');
+        if (!btn) return;
+        getCurrentSong().rangeMode = btn.dataset.range;
+        saveSongs();
+        renderSetup();
+      });
+
+      document.getElementById('setup-diff-group').addEventListener('click', (e) => {
+        const btn = e.target.closest('.setup-diff-btn');
+        if (!btn) return;
+        getCurrentSong().complexity = btn.dataset.complexity;
+        saveSongs();
+        renderSetup();
+      });
+
+      document.getElementById('setup-speed-group').addEventListener('click', (e) => {
+        const btn = e.target.closest('.setup-speed-btn');
+        if (!btn) return;
+        state.speed = parseFloat(btn.dataset.speed) || 1;
+        renderSetup();
+      });
+
+      document.getElementById('setup-transpose').addEventListener('input', (e) => {
+        getCurrentSong().transpose = parseInt(e.target.value, 10) || 0;
+        saveSongs();
+        renderSetup();
+      });
+
+      const modal = document.getElementById('modal-add');
+      document.getElementById('btn-open-add').addEventListener('click', () => {
+        document.getElementById('modal-status').textContent = '';
+        modal.classList.remove('hidden');
+      });
+      document.getElementById('btn-close-modal').addEventListener('click', () => modal.classList.add('hidden'));
+
+      document.getElementById('btn-save-modal').addEventListener('click', () => {
+        const title = document.getElementById('modal-title').value.trim();
+        const notes = document.getElementById('modal-notes').value.trim();
+        if (!title || !notes) {
+          document.getElementById('modal-status').textContent = 'Please enter a song title and notes.';
+          return;
+        }
+        const lyricParts = document.getElementById('modal-lyrics').value.split('|').map(t => t.trim()).filter(Boolean);
+        const parsed = parseNoteText(notes);
+        const maxBeat = parsed.length ? parsed[parsed.length - 1].beat + parsed[parsed.length - 1].dur : 16;
+        const lyrics = lyricParts.length ? lyricParts.map((text, idx) => ({ beat: idx * (maxBeat / lyricParts.length), text })) : [];
+
+        const newSong = {
+          id: 'custom-' + Date.now(),
+          title,
+          tag: 'Custom',
+          bpm: 110,
+          rangeMode: '8',
+          complexity: 'melody',
+          transpose: 0,
+          melodyText: notes,
+          lyrics
+        };
+        songs.push(newSong);
+        saveSongs();
+        modal.classList.add('hidden');
+        state.currentSongId = newSong.id;
+        showScreen('setup');
+      });
+
+      document.getElementById('file-upload').addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const lower = file.name.toLowerCase();
+        try {
+          let parsed;
+          if (lower.endsWith('.mid') || lower.endsWith('.midi')) {
+            parsed = parseMidiFile(await file.arrayBuffer());
+          } else {
+            parsed = parseMusicXml(await file.text());
+          }
+          if (!parsed.melodyEvents.length) {
+            document.getElementById('modal-status').textContent = 'No pitched notes found in that file.';
+            return;
+          }
+          const newSong = {
+            id: 'import-' + Date.now(),
+            title: parsed.title || file.name.replace(/\.(mid|midi|musicxml|xml)$/i, ''),
+            tag: 'Imported',
+            bpm: parsed.bpm || 120,
+            rangeMode: '13',
+            complexity: 'melody',
+            transpose: 0,
+            melodyEvents: parsed.melodyEvents,
+            harmonyEvents: parsed.harmonyEvents,
+            lyrics: []
+          };
+          songs.push(newSong);
+          saveSongs();
+          modal.classList.add('hidden');
+          state.currentSongId = newSong.id;
+          showScreen('setup');
+        } catch (err) {
+          document.getElementById('modal-status').textContent = 'Could not read file: ' + err.message;
+        }
+        e.target.value = '';
+      });
+
+      canvas.addEventListener('pointerdown', (e) => {
+        if (state.screen !== 'play') return;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const bellZoneH = Math.max(74, Math.min(102, rect.height * 0.17));
+        if (y >= rect.height - bellZoneH) {
+          const bells = cachedCompiled.activeBells;
+          const idx = Math.min(bells.length - 1, Math.max(0, Math.floor((x / rect.width) * bells.length)));
+          const bell = bells[idx];
+          state.laneFlash.set(bell.midi, 1.0);
+          playBellSound(bell.midi);
+          spawnHitJuice(idx, bells.length, bell, rect.width, rect.height - bellZoneH);
+        }
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (state.screen !== 'play') return;
+        if (e.code === 'Space') { e.preventDefault(); togglePause(); }
+        else if (e.key >= '1' && e.key <= '8') {
+          const bells = getActiveBells('8');
+          const idx = parseInt(e.key, 10) - 1;
+          const bell = bells[idx];
+          if (bell) {
+            state.laneFlash.set(bell.midi, 1.0);
+            playBellSound(bell.midi);
+            const rect = canvasContainer.getBoundingClientRect();
+            const bellZoneH = Math.max(74, Math.min(102, rect.height * 0.17));
+            spawnHitJuice(idx, cachedCompiled.activeBells.length, bell, rect.width, rect.height - bellZoneH);
+          }
+        }
+      });
+
+      window.addEventListener('resize', resizeCanvas);
+      
+      (function initWwSnow() {
+        const layer = document.getElementById('ww-snow');
+        if (!layer) return;
+        const symbols = ['❄', '✦', '•', '❅'];
+        const count = Math.min(80, Math.max(35, Math.floor(window.innerWidth / 14)));
+        for (let i = 0; i < count; i++) {
+          const flake = document.createElement('span');
+          flake.className = 'ww-flake';
+          flake.textContent = symbols[i % symbols.length];
+          const dur = 8 + Math.random() * 14;
+          flake.style.left = Math.random() * 100 + '%';
+          flake.style.fontSize = (8 + Math.random() * 14) + 'px';
+          flake.style.animationDuration = dur + 's';
+          flake.style.animationDelay = (-Math.random() * dur) + 's';
+          flake.style.setProperty('--drift', (Math.random() * 140 - 70) + 'px');
+          flake.style.opacity = (0.4 + Math.random() * 0.55).toFixed(2);
+          layer.appendChild(flake);
+        }
+      })();
+
+      window.onload = () => {
+        initSplash();
+        requestAnimationFrame(drawFrame);
+      };
+    })();
+  </script>
+</body>
+</html>
