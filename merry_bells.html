@@ -421,11 +421,6 @@
     </header>
 
     <main class="flex-1 max-w-3xl w-full mx-auto px-6 py-8">
-      <div class="flex justify-end mb-3">
-        <button id="btn-background-music" class="candy-btn px-3 py-2 rounded-2xl bg-white border-2 border-slate-200 border-b-4 text-slate-700 text-xs font-extrabold" type="button">
-          ♪ Play music
-        </button>
-      </div>
       <p id="shared-library-status" class="text-xs font-semibold text-slate-500 mb-3 min-h-[16px]"></p>
       <div class="bg-white border-2 border-slate-200/90 rounded-3xl shadow-sm overflow-hidden">
         <div id="library-list" class="divide-y divide-slate-100"></div>
@@ -911,48 +906,47 @@
       backgroundMusic.volume = 0.16;
       let backgroundMusicStoppedForSong = false;
 
-      function updateBackgroundMusicButton() {
-        const button = document.getElementById('btn-background-music');
-        button.textContent = backgroundMusicStoppedForSong
-          ? '♪ Music stopped'
-          : backgroundMusic.paused ? '♪ Play music' : '♪ Pause music';
-        button.disabled = backgroundMusicStoppedForSong;
-        button.title = backgroundMusicStoppedForSong
-          ? 'Background music stops after you select a song.'
-          : '';
-      }
-
-      async function startBackgroundMusic() {
+      function startBackgroundMusic() {
         if (backgroundMusicStoppedForSong) return;
-        try {
-          await backgroundMusic.play();
-        } catch (error) {
-          console.warn('Background music could not start.', error);
+        const playback = backgroundMusic.play();
+        if (playback) {
+          playback.catch(error => {
+            if (error.name !== 'NotAllowedError') {
+              console.error('Background music could not start.', error);
+            }
+          });
         }
-        updateBackgroundMusicButton();
       }
 
       function stopBackgroundMusicForSong() {
         backgroundMusicStoppedForSong = true;
         backgroundMusic.pause();
         backgroundMusic.currentTime = 0;
-        updateBackgroundMusicButton();
+        document.removeEventListener('pointerdown', startBackgroundMusicFromInteraction, true);
+        document.removeEventListener('keydown', startBackgroundMusicFromInteraction, true);
       }
 
-      document.getElementById('btn-background-music').addEventListener('click', () => {
-        if (backgroundMusic.paused) startBackgroundMusic();
-        else {
-          backgroundMusic.pause();
-          updateBackgroundMusicButton();
+      function startBackgroundMusicFromInteraction(event) {
+        if (backgroundMusicStoppedForSong) return;
+        if (event.target instanceof Element && event.target.closest('.song-library-row')) return;
+
+        const playback = backgroundMusic.play();
+        if (playback) {
+          playback.then(() => {
+            document.removeEventListener('pointerdown', startBackgroundMusicFromInteraction, true);
+            document.removeEventListener('keydown', startBackgroundMusicFromInteraction, true);
+          }).catch(error => {
+            if (error.name !== 'NotAllowedError') {
+              console.error('Background music could not start after page interaction.', error);
+            }
+          });
         }
-      });
-      backgroundMusic.addEventListener('play', updateBackgroundMusicButton);
-      backgroundMusic.addEventListener('pause', updateBackgroundMusicButton);
+      }
+
+      document.addEventListener('pointerdown', startBackgroundMusicFromInteraction, true);
+      document.addEventListener('keydown', startBackgroundMusicFromInteraction, true);
       backgroundMusic.addEventListener('error', () => {
         console.error('Background music failed to load.', backgroundMusic.error);
-        const button = document.getElementById('btn-background-music');
-        button.textContent = '♪ Music unavailable';
-        button.title = 'The background music file could not be loaded.';
       });
       startBackgroundMusic();
 
@@ -1223,7 +1217,7 @@
         }
         songs.forEach((s) => {
           const row = document.createElement('div');
-          row.className = 'px-5 py-4 hover:bg-rose-50/40 transition cursor-pointer flex items-center justify-between gap-4';
+          row.className = 'song-library-row px-5 py-4 hover:bg-rose-50/40 transition cursor-pointer flex items-center justify-between gap-4';
           const title = document.createElement('span');
           title.className = 'font-game text-lg font-bold text-slate-900 truncate';
           title.textContent = s.title || 'Untitled song';
