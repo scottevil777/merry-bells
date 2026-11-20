@@ -284,7 +284,7 @@
   <!-- =========================================================
        SPLASH SCREEN (White background + Paper-Cutout Puppets)
        ========================================================= -->
-  <div id="splash-screen" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-between overflow-hidden transition-opacity duration-700 cursor-pointer">
+  <div id="splash-screen" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-between overflow-hidden transition-opacity duration-700">
     <div id="snow-layer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
 
     <!-- Hanging Paper-Tag Logo on Twine -->
@@ -301,6 +301,10 @@
         <span class="mt-1 text-xs font-extrabold uppercase tracking-widest text-amber-700/80">Holiday Handbell Game</span>
       </div>
     </div>
+
+    <button id="btn-start-ringing" class="relative z-20 candy-btn px-10 py-4 rounded-3xl bg-gradient-to-b from-rose-400 to-rose-600 border-b-[6px] border-rose-800 text-white font-game text-2xl font-bold tracking-wide shadow-xl shadow-rose-500/25">
+      START RINGING
+    </button>
 
     <!-- Bottom Stage: Two Articulated Paper-Cutout Puppets on Wooden Sticks -->
     <div class="relative z-10 w-full max-w-3xl px-6 flex items-end justify-between sm:justify-around pb-0">
@@ -922,33 +926,11 @@
         backgroundMusicStoppedForSong = true;
         backgroundMusic.pause();
         backgroundMusic.currentTime = 0;
-        document.removeEventListener('pointerdown', startBackgroundMusicFromInteraction, true);
-        document.removeEventListener('keydown', startBackgroundMusicFromInteraction, true);
       }
 
-      function startBackgroundMusicFromInteraction(event) {
-        if (backgroundMusicStoppedForSong) return;
-        if (event.target instanceof Element && event.target.closest('.song-library-row')) return;
-
-        const playback = backgroundMusic.play();
-        if (playback) {
-          playback.then(() => {
-            document.removeEventListener('pointerdown', startBackgroundMusicFromInteraction, true);
-            document.removeEventListener('keydown', startBackgroundMusicFromInteraction, true);
-          }).catch(error => {
-            if (error.name !== 'NotAllowedError') {
-              console.error('Background music could not start after page interaction.', error);
-            }
-          });
-        }
-      }
-
-      document.addEventListener('pointerdown', startBackgroundMusicFromInteraction, true);
-      document.addEventListener('keydown', startBackgroundMusicFromInteraction, true);
       backgroundMusic.addEventListener('error', () => {
         console.error('Background music failed to load.', backgroundMusic.error);
       });
-      startBackgroundMusic();
 
       let audioCtx = null;
       function ensureAudio() {
@@ -1198,8 +1180,10 @@
           showScreen('library');
           setTimeout(() => splash.classList.add('view-hidden'), 700);
         }
-        splash.addEventListener('click', dismissSplash);
-        setTimeout(dismissSplash, 2500);
+        document.getElementById('btn-start-ringing').addEventListener('click', () => {
+          startBackgroundMusic();
+          dismissSplash();
+        });
       }
 
       // =========================================================
