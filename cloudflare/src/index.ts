@@ -19,6 +19,11 @@ interface SongRow {
   created_at: string;
 }
 
+interface StoredSongPaths {
+  object_path: string;
+  backing_track_path: string | null;
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'content-type',
@@ -71,6 +76,7 @@ export default {
 
     let action: string;
     let accessCode: string;
+    let songId = '';
     let uploadFile: File | null = null;
     let songInput: SongInput | null = null;
     try {
@@ -83,9 +89,10 @@ export default {
         const song = form.get('song');
         songInput = typeof song === 'string' ? JSON.parse(song) : null;
       } else {
-        const body = await request.json() as { action?: unknown; accessCode?: unknown };
+        const body = await request.json() as { action?: unknown; accessCode?: unknown; songId?: unknown };
         action = String(body?.action || '');
         accessCode = String(body?.accessCode || '');
+        songId = String(body?.songId || '');
       }
     } catch {
       return jsonResponse({ error: 'Invalid request data.' }, 400);
@@ -112,6 +119,42 @@ export default {
         console.error('Could not load the shared song library.', error);
         return jsonResponse({ error: 'Could not load shared songs.' }, 500);
       }
+    }
+
+    if (action === 'delete') {
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(songId)) {
+        return jsonResponse({ error: 'Invalid song ID.' }, 400);
+      }
+
+      let storedPaths: StoredSongPaths | null;
+      try {
+        storedPaths = await env.SONGS_DB.prepare(
+          'SELECT object_path, backing_track_path FROM midi_songs WHERE id = ?',
+        ).bind(songId).first<StoredSongPaths>();
+      } catch (error) {
+        console.error('Could not look up the shared song to delete.', error);
+        return jsonResponse({ error: 'Could not find the shared song.' }, 500);
+      }
+      if (!storedPaths) return jsonResponse({ error: 'That shared song no longer exists.' }, 404);
+
+      try {
+        await env.MIDI_BUCKET.delete(storedPaths.object_path);
+        if (storedPaths.backing_track_path) {
+          await env.MIDI_BUCKET.delete(storedPaths.backing_track_path);
+        }
+      } catch (error) {
+        console.error('Could not remove the shared song files from R2.', error);
+        return jsonResponse({ error: 'Could not remove the song files from storage. The song remains in the library.' }, 502);
+      }
+
+      try {
+        await env.SONGS_DB.prepare('DELETE FROM midi_songs WHERE id = ?').bind(songId).run();
+      } catch (error) {
+        console.error('Could not remove the shared song record from D1.', error);
+        return jsonResponse({ error: 'The song files were removed, but its library record could not be deleted. Try again.' }, 502);
+      }
+
+      return jsonResponse({ ok: true });
     }
 
     if (action !== 'upload' || !uploadFile || !songInput) {

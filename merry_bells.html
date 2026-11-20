@@ -421,6 +421,11 @@
     </header>
 
     <main class="flex-1 max-w-3xl w-full mx-auto px-6 py-8">
+      <div class="flex justify-end mb-3">
+        <button id="btn-background-music" class="candy-btn px-3 py-2 rounded-2xl bg-white border-2 border-slate-200 border-b-4 text-slate-700 text-xs font-extrabold" type="button">
+          ♪ Play music
+        </button>
+      </div>
       <p id="shared-library-status" class="text-xs font-semibold text-slate-500 mb-3 min-h-[16px]"></p>
       <div class="bg-white border-2 border-slate-200/90 rounded-3xl shadow-sm overflow-hidden">
         <div id="library-list" class="divide-y divide-slate-100"></div>
@@ -492,11 +497,10 @@
         <!-- 3. Speed -->
         <div>
           <label class="block font-game text-sm font-bold text-slate-700 mb-2.5">3. Speed</label>
-          <div class="grid grid-cols-4 gap-2" id="setup-speed-group">
+          <div class="grid grid-cols-3 gap-2" id="setup-speed-group">
             <button data-speed="0.5" class="setup-speed-btn candy-btn py-2.5 rounded-2xl border-2 border-b-4 text-sm font-extrabold">0.5x</button>
+            <button data-speed="0.75" class="setup-speed-btn candy-btn py-2.5 rounded-2xl border-2 border-b-4 text-sm font-extrabold">0.75x</button>
             <button data-speed="1"   class="setup-speed-btn candy-btn py-2.5 rounded-2xl border-2 border-b-4 text-sm font-extrabold">1.0x</button>
-            <button data-speed="1.5" class="setup-speed-btn candy-btn py-2.5 rounded-2xl border-2 border-b-4 text-sm font-extrabold">1.5x</button>
-            <button data-speed="2"   class="setup-speed-btn candy-btn py-2.5 rounded-2xl border-2 border-b-4 text-sm font-extrabold">2.0x</button>
           </div>
         </div>
 
@@ -902,6 +906,56 @@
         return { title, bpm, melodyEvents: extractTopLine(allNotes), harmonyEvents: allNotes };
       }
 
+      const backgroundMusic = new Audio('/assets/christmas-story.mp3');
+      backgroundMusic.loop = true;
+      backgroundMusic.volume = 0.16;
+      let backgroundMusicStoppedForSong = false;
+
+      function updateBackgroundMusicButton() {
+        const button = document.getElementById('btn-background-music');
+        button.textContent = backgroundMusicStoppedForSong
+          ? '♪ Music stopped'
+          : backgroundMusic.paused ? '♪ Play music' : '♪ Pause music';
+        button.disabled = backgroundMusicStoppedForSong;
+        button.title = backgroundMusicStoppedForSong
+          ? 'Background music stops after you select a song.'
+          : '';
+      }
+
+      async function startBackgroundMusic() {
+        if (backgroundMusicStoppedForSong) return;
+        try {
+          await backgroundMusic.play();
+        } catch (error) {
+          console.warn('Background music could not start.', error);
+        }
+        updateBackgroundMusicButton();
+      }
+
+      function stopBackgroundMusicForSong() {
+        backgroundMusicStoppedForSong = true;
+        backgroundMusic.pause();
+        backgroundMusic.currentTime = 0;
+        updateBackgroundMusicButton();
+      }
+
+      document.getElementById('btn-background-music').addEventListener('click', () => {
+        if (backgroundMusic.paused) startBackgroundMusic();
+        else {
+          backgroundMusic.pause();
+          updateBackgroundMusicButton();
+        }
+      });
+      backgroundMusic.addEventListener('play', updateBackgroundMusicButton);
+      backgroundMusic.addEventListener('pause', updateBackgroundMusicButton);
+      backgroundMusic.addEventListener('error', () => {
+        console.error('Background music failed to load.', backgroundMusic.error);
+        const button = document.getElementById('btn-background-music');
+        button.textContent = '♪ Music unavailable';
+        button.title = 'The background music file could not be loaded.';
+      });
+      startBackgroundMusic();
+
       let audioCtx = null;
       function ensureAudio() {
         if (!audioCtx || audioCtx.state === 'closed') {
@@ -999,17 +1053,24 @@
       }
 
       let songs = [];
+      let hasSavedSongs = false;
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) songs = JSON.parse(saved);
+        if (saved !== null) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            songs = parsed;
+            hasSavedSongs = true;
+          }
+        }
       } catch (_) {}
-      if (!Array.isArray(songs) || songs.length === 0) {
+      if (!hasSavedSongs) {
         songs = JSON.parse(JSON.stringify(DEFAULT_SONGS));
       }
 
       const state = {
         screen: 'library',
-        currentSongId: songs[0].id,
+        currentSongId: songs[0]?.id || null,
         soundOn: true,
         speed: 1,
         isPlaying: false,
@@ -1034,7 +1095,11 @@
         try {
           const localSongs = songs.filter(song => !song.cloudId);
           localStorage.setItem(STORAGE_KEY, JSON.stringify(localSongs));
-        } catch (_) {}
+          return true;
+        } catch (error) {
+          console.error('Could not save the song library on this device.', error);
+          return false;
+        }
       }
 
       function setSharedLibraryStatus(message, isError = false) {
@@ -1084,16 +1149,7 @@
           : (song.melodyEvents || parseNoteText(song.melodyText));
 
         if (song.complexity === 'simple') {
-          const simplified = [];
-          let lastBeat = -99;
-          for (const n of raw) {
-            const qBeat = Math.round(n.beat * 2) / 2;
-            if (qBeat - lastBeat >= 0.5) {
-              simplified.push({ midi: n.midi, beat: qBeat, dur: Math.max(0.5, n.dur) });
-              lastBeat = qBeat;
-            }
-          }
-          raw = simplified;
+          raw = raw.filter((_, index) => index % 2 === 0 || index === raw.length - 1);
         }
 
         const secPerBeat = 60 / (song.bpm || 120);
@@ -1114,7 +1170,9 @@
         return { compiled, totalSec, autoFittedCount, activeBells };
       }
 
-      let cachedCompiled = compileSong(getCurrentSong());
+      let cachedCompiled = songs.length
+        ? compileSong(getCurrentSong())
+        : { compiled: [], totalSec: 5, autoFittedCount: 0, activeBells: getActiveBells('8') };
 
       // =========================================================
       // SPLASH SCREEN (Paper snowflakes + Cutout Puppets)
@@ -1156,6 +1214,13 @@
       function renderLibrary() {
         const list = document.getElementById('library-list');
         list.innerHTML = '';
+        if (!songs.length) {
+          const emptyMessage = document.createElement('p');
+          emptyMessage.className = 'px-5 py-8 text-center text-sm font-semibold text-slate-500';
+          emptyMessage.textContent = 'No songs in your library. Add a song or upload a MIDI file to get started.';
+          list.appendChild(emptyMessage);
+          return;
+        }
         songs.forEach((s) => {
           const row = document.createElement('div');
           row.className = 'px-5 py-4 hover:bg-rose-50/40 transition cursor-pointer flex items-center justify-between gap-4';
@@ -1168,13 +1233,54 @@
           const selectButton = document.createElement('button');
           selectButton.className = 'candy-btn px-4 py-2 rounded-xl bg-gradient-to-b from-rose-400 to-rose-600 border-b-4 border-rose-800 text-white text-xs font-extrabold shrink-0';
           selectButton.textContent = 'Select →';
-          row.append(titleWrap, selectButton);
+          const removeButton = document.createElement('button');
+          removeButton.className = 'candy-btn px-3 py-2 rounded-xl bg-white border-2 border-rose-200 border-b-4 text-rose-700 text-xs font-extrabold shrink-0';
+          removeButton.textContent = 'Remove';
+          removeButton.type = 'button';
+          removeButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            removeSong(s);
+          });
+          const actions = document.createElement('div');
+          actions.className = 'flex items-center gap-2';
+          actions.append(selectButton, removeButton);
+          row.append(titleWrap, actions);
           row.addEventListener('click', () => {
+            stopBackgroundMusicForSong();
             state.currentSongId = s.id;
             showScreen('setup');
           });
           list.appendChild(row);
         });
+      }
+
+      async function removeSong(song) {
+        const isShared = Boolean(song.cloudId);
+        const scope = isShared
+          ? 'This permanently removes it from the shared library for everyone with access.'
+          : 'This removes it from this browser, including built-in songs.';
+        if (!window.confirm(`Remove "${song.title}"? ${scope}`)) return;
+
+        if (isShared) {
+          try {
+            await callLibrary('delete', { songId: song.cloudId });
+          } catch (error) {
+            setSharedLibraryStatus(error.message || 'Could not remove the shared song.', true);
+            return;
+          }
+        }
+
+        const previousSongs = songs;
+        songs = songs.filter(candidate => candidate.id !== song.id);
+        if (!isShared && !saveSongs()) {
+          songs = previousSongs;
+          setSharedLibraryStatus('Could not save the change on this device, so the song was not removed.', true);
+          return;
+        }
+
+        if (state.currentSongId === song.id) state.currentSongId = songs[0]?.id || null;
+        renderLibrary();
+        setSharedLibraryStatus(`Removed "${song.title}" from ${isShared ? 'the shared library' : 'this browser'}.`);
       }
 
       // =========================================================
@@ -1660,6 +1766,7 @@
         songs.push(newSong);
         saveSongs();
         modal.classList.add('hidden');
+        stopBackgroundMusicForSong();
         state.currentSongId = newSong.id;
         showScreen('setup');
       });
@@ -1707,6 +1814,7 @@
           saveSongs();
           setSharedLibraryStatus(`Saved "${newSong.title}" to the shared library.`);
           modal.classList.add('hidden');
+          stopBackgroundMusicForSong();
           state.currentSongId = newSong.id;
           showScreen('setup');
         } catch (err) {

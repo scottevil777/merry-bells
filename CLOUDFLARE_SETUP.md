@@ -49,4 +49,4 @@ To publish this repository as a site, create a **Pages** project from the GitHub
 
 Uploads are limited to 4 MB. R2 holds the original file; D1 holds its parsed notes, tempo, and song metadata. Optional backing-track path and synchronization fields are included in the schema for later audio upload/playback work; this initial backend does not upload or play backing tracks.
 
-Anyone with the shared code can view and add songs. This setup has no user accounts, per-user access, rate limiting, or strong security; do not use it for sensitive files.
+Anyone with the shared code can view, add, and delete shared songs. Deleting a shared song removes it for everyone with access. This setup has no user accounts, per-user access, rate limiting, or strong security; do not use it for sensitive files.
