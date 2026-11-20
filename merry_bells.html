@@ -409,13 +409,19 @@
         </div>
       </div>
 
-      <button id="btn-open-add" class="candy-btn px-4 py-2.5 rounded-2xl bg-gradient-to-b from-emerald-400 to-emerald-600 border-b-4 border-emerald-800 text-white text-xs sm:text-sm font-extrabold shadow-sm flex items-center gap-1.5">
-        <span>+</span>
-        <span>Add Song / MIDI</span>
-      </button>
+      <div class="flex items-center gap-2">
+        <button id="btn-library-access" class="candy-btn px-3 py-2.5 rounded-2xl bg-white border-2 border-slate-200 border-b-4 text-slate-700 text-xs font-extrabold">
+          Unlock Shared Library
+        </button>
+        <button id="btn-open-add" class="candy-btn px-4 py-2.5 rounded-2xl bg-gradient-to-b from-emerald-400 to-emerald-600 border-b-4 border-emerald-800 text-white text-xs sm:text-sm font-extrabold shadow-sm flex items-center gap-1.5">
+          <span>+</span>
+          <span>Add Song / MIDI</span>
+        </button>
+      </div>
     </header>
 
     <main class="flex-1 max-w-3xl w-full mx-auto px-6 py-8">
+      <p id="shared-library-status" class="text-xs font-semibold text-slate-500 mb-3 min-h-[16px]"></p>
       <div class="bg-white border-2 border-slate-200/90 rounded-3xl shadow-sm overflow-hidden">
         <div id="library-list" class="divide-y divide-slate-100"></div>
       </div>
@@ -473,7 +479,7 @@
               <div class="text-[11px] font-semibold opacity-80">Simplified</div>
             </button>
             <button data-complexity="melody" class="setup-diff-btn candy-btn py-3.5 px-2 rounded-2xl border-2 border-b-4 text-center">
-              <div class="font-game text-lg font-bold">Normal</div>
+              <div class="font-game text-lg font-bold">Medium</div>
               <div class="text-[11px] font-semibold opacity-80">Melody</div>
             </button>
             <button data-complexity="harmony" class="setup-diff-btn candy-btn py-3.5 px-2 rounded-2xl border-2 border-b-4 text-center">
@@ -532,7 +538,7 @@
 
       <div class="text-center hidden sm:block truncate">
         <span id="hud-title" class="font-game text-lg font-bold text-slate-900">Jingle Bells</span>
-        <span id="hud-meta" class="ml-2 text-xs font-bold text-rose-500">8 Bells · Normal · 1.0x</span>
+        <span id="hud-meta" class="ml-2 text-xs font-bold text-rose-500">8 Bells · Medium · 1.0x</span>
       </div>
 
       <div class="flex items-center gap-2">
@@ -573,7 +579,7 @@
 
       <label class="block cursor-pointer border-2 border-dashed border-rose-300 hover:border-rose-500 rounded-2xl p-5 text-center bg-rose-50/40 hover:bg-rose-50 transition">
         <div class="text-sm font-extrabold text-slate-800">Upload a .mid or .musicxml file</div>
-        <div class="text-xs text-slate-500 mt-0.5">Auto-generates 8, 13 &amp; 20-bell + Easy/Normal/Hard modes</div>
+        <div class="text-xs text-slate-500 mt-0.5">Shared cloud upload · playable in 8/13/20-bell and Easy/Medium/Hard modes</div>
         <input id="file-upload" type="file" accept=".mid,.midi,.musicxml,.xml" class="hidden" />
       </label>
 
@@ -584,6 +590,7 @@
       </div>
 
       <div class="space-y-3">
+        <p class="text-[11px] text-slate-500">Typed songs stay in this browser. MIDI/MusicXML uploads are saved to the shared library.</p>
         <input id="modal-title" type="text" placeholder="Song Title" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 text-sm font-semibold focus:outline-none focus:border-rose-500" />
         <textarea id="modal-notes" rows="3" placeholder="Example: E4:1 E4:1 E4:2 E4:1 E4:1 E4:2" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 text-xs font-mono focus:outline-none focus:border-rose-500"></textarea>
         <input id="modal-lyrics" type="text" placeholder="Optional lyrics separated by | (e.g. Line one | Line two)" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 text-xs focus:outline-none focus:border-rose-500" />
@@ -595,8 +602,25 @@
     </div>
   </div>
 
+  <div id="modal-library-access" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-[2rem] max-w-sm w-full p-6 shadow-2xl border-2 border-slate-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-game text-xl font-bold text-slate-900">Shared Song Library</h3>
+        <button id="btn-close-library-access" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm" aria-label="Close">✕</button>
+      </div>
+      <p class="text-sm text-slate-600">Enter the shared access code to load and add songs. Everyone using the code shares this library.</p>
+      <input id="library-access-code" type="password" autocomplete="current-password" placeholder="Access code" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 text-sm font-semibold focus:outline-none focus:border-rose-500" />
+      <p id="library-access-status" class="text-xs font-bold text-rose-600 min-h-[16px]"></p>
+      <button id="btn-submit-library-access" class="candy-btn w-full py-3 rounded-2xl bg-gradient-to-b from-emerald-400 to-emerald-600 border-b-4 border-emerald-800 text-white text-sm font-extrabold">Unlock library</button>
+      <p class="text-[11px] text-slate-400">This shared code is a convenience gate, not private or secure authentication.</p>
+    </div>
+  </div>
+
   <script>
     (function () {
+      const CLOUDFLARE_API_URL = 'https://merry-bells-library.merry-bells-library-6a36.workers.dev';
+      const ACCESS_CODE_KEY = 'merry_bells_shared_access_code';
+
       const ALL_BELLS = [
         { midi: 57, name: 'A3',  label: 'A',   color: '#6366f1', dark: '#4338ca', text: '#ffffff', sharp: false },
         { midi: 58, name: 'A#3', label: 'A♯',  color: '#475569', dark: '#1e293b', text: '#ffffff', sharp: true  },
@@ -919,6 +943,54 @@
       }
 
       const STORAGE_KEY = 'merry_bells_paper_v4';
+      let sharedAccessCode = '';
+      try { sharedAccessCode = localStorage.getItem(ACCESS_CODE_KEY) || ''; } catch (_) {}
+
+      function isCloudConfigured() {
+        return CLOUDFLARE_API_URL.startsWith('https://') &&
+          !CLOUDFLARE_API_URL.includes('YOUR_CLOUDFLARE');
+      }
+
+      async function callLibrary(action, payload = {}, accessCode = sharedAccessCode) {
+        if (!isCloudConfigured()) {
+          throw new Error('Shared storage is not configured yet. Add the Cloudflare Worker URL to merry_bells.html.');
+        }
+        const response = await fetch(`${CLOUDFLARE_API_URL.replace(/\/+$/, '')}/api/midi-library`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, accessCode, ...payload })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const error = new Error(result.error || `Shared library request failed (${response.status}).`);
+          error.status = response.status;
+          throw error;
+        }
+        return result;
+      }
+
+      async function uploadToLibrary(file, song) {
+        if (!isCloudConfigured()) {
+          throw new Error('Shared storage is not configured yet. Add the Cloudflare Worker URL to merry_bells.html.');
+        }
+        const form = new FormData();
+        form.append('action', 'upload');
+        form.append('accessCode', sharedAccessCode);
+        form.append('file', file, file.name);
+        form.append('song', JSON.stringify(song));
+        const response = await fetch(`${CLOUDFLARE_API_URL.replace(/\/+$/, '')}/api/midi-library`, {
+          method: 'POST',
+          body: form
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const error = new Error(result.error || `Upload failed (${response.status}).`);
+          error.status = response.status;
+          throw error;
+        }
+        return result.song;
+      }
+
       let songs = [];
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -952,7 +1024,32 @@
       const PRAISE_WORDS = ['DING!', 'SWEET!', 'MERRY!', 'JOY!'];
 
       function saveSongs() {
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(songs)); } catch (_) {}
+        try {
+          const localSongs = songs.filter(song => !song.cloudId);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(localSongs));
+        } catch (_) {}
+      }
+
+      function setSharedLibraryStatus(message, isError = false) {
+        const status = document.getElementById('shared-library-status');
+        status.textContent = message;
+        status.className = `text-xs font-semibold mb-3 min-h-[16px] ${isError ? 'text-rose-600' : 'text-slate-500'}`;
+      }
+
+      async function loadSharedSongs(accessCode = sharedAccessCode) {
+        const result = await callLibrary('list', {}, accessCode);
+        const localSongs = songs.filter(song => !song.cloudId);
+        const cloudSongs = (result.songs || []).map(row => ({
+          ...row.song_data,
+          id: `cloud-${row.id}`,
+          cloudId: row.id,
+          title: row.title,
+          tag: 'Shared'
+        }));
+        songs = [...localSongs, ...cloudSongs];
+        saveSongs();
+        renderLibrary();
+        setSharedLibraryStatus(`Shared library loaded · ${cloudSongs.length} song${cloudSongs.length === 1 ? '' : 's'}`);
       }
 
       function getCurrentSong() {
@@ -1055,14 +1152,16 @@
         songs.forEach((s) => {
           const row = document.createElement('div');
           row.className = 'px-5 py-4 hover:bg-rose-50/40 transition cursor-pointer flex items-center justify-between gap-4';
-          row.innerHTML = `
-            <div class="min-w-0 flex items-center gap-3.5">
-              <span class="font-game text-lg font-bold text-slate-900 truncate">${s.title}</span>
-            </div>
-            <button class="candy-btn px-4 py-2 rounded-xl bg-gradient-to-b from-rose-400 to-rose-600 border-b-4 border-rose-800 text-white text-xs font-extrabold shrink-0">
-              Select →
-            </button>
-          `;
+          const title = document.createElement('span');
+          title.className = 'font-game text-lg font-bold text-slate-900 truncate';
+          title.textContent = s.title || 'Untitled song';
+          const titleWrap = document.createElement('div');
+          titleWrap.className = 'min-w-0 flex items-center gap-3.5';
+          titleWrap.appendChild(title);
+          const selectButton = document.createElement('button');
+          selectButton.className = 'candy-btn px-4 py-2 rounded-xl bg-gradient-to-b from-rose-400 to-rose-600 border-b-4 border-rose-800 text-white text-xs font-extrabold shrink-0';
+          selectButton.textContent = 'Select →';
+          row.append(titleWrap, selectButton);
           row.addEventListener('click', () => {
             state.currentSongId = s.id;
             showScreen('setup');
@@ -1175,7 +1274,7 @@
         const song = getCurrentSong();
         cachedCompiled = compileSong(song);
 
-        const diffLabel = song.complexity === 'simple' ? 'Easy' : song.complexity === 'harmony' ? 'Hard' : 'Normal';
+        const diffLabel = song.complexity === 'simple' ? 'Easy' : song.complexity === 'harmony' ? 'Hard' : 'Medium';
         document.getElementById('hud-title').textContent = song.title;
         document.getElementById('hud-meta').textContent = `${song.rangeMode} Bells · ${diffLabel} · ${state.speed}x`;
 
@@ -1492,6 +1591,42 @@
       });
       document.getElementById('btn-close-modal').addEventListener('click', () => modal.classList.add('hidden'));
 
+      const accessModal = document.getElementById('modal-library-access');
+      const accessInput = document.getElementById('library-access-code');
+      const accessStatus = document.getElementById('library-access-status');
+      document.getElementById('btn-library-access').addEventListener('click', () => {
+        accessInput.value = sharedAccessCode;
+        accessStatus.textContent = '';
+        accessModal.classList.remove('hidden');
+        accessInput.focus();
+      });
+      document.getElementById('btn-close-library-access').addEventListener('click', () => accessModal.classList.add('hidden'));
+      document.getElementById('btn-submit-library-access').addEventListener('click', async () => {
+        const code = accessInput.value.trim();
+        if (!code) {
+          accessStatus.textContent = 'Enter the shared access code.';
+          return;
+        }
+        const submitButton = document.getElementById('btn-submit-library-access');
+        submitButton.disabled = true;
+        accessStatus.textContent = 'Checking code and loading songs…';
+        try {
+          await callLibrary('verify', {}, code);
+          sharedAccessCode = code;
+          try { localStorage.setItem(ACCESS_CODE_KEY, code); } catch (_) {}
+          await loadSharedSongs(code);
+          document.getElementById('btn-library-access').textContent = 'Shared Library Unlocked';
+          accessModal.classList.add('hidden');
+        } catch (err) {
+          accessStatus.textContent = err.message || 'Could not unlock the shared library.';
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+      accessInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') document.getElementById('btn-submit-library-access').click();
+      });
+
       document.getElementById('btn-save-modal').addEventListener('click', () => {
         const title = document.getElementById('modal-title').value.trim();
         const notes = document.getElementById('modal-notes').value.trim();
@@ -1527,6 +1662,8 @@
         if (!file) return;
         const lower = file.name.toLowerCase();
         try {
+          if (!sharedAccessCode) throw new Error('Unlock the shared library with its access code before uploading a MIDI file.');
+          document.getElementById('modal-status').textContent = 'Reading and preparing your song…';
           let parsed;
           if (lower.endsWith('.mid') || lower.endsWith('.midi')) {
             parsed = parseMidiFile(await file.arrayBuffer());
@@ -1535,9 +1672,10 @@
           }
           if (!parsed.melodyEvents.length) {
             document.getElementById('modal-status').textContent = 'No pitched notes found in that file.';
+            e.target.value = '';
             return;
           }
-          const newSong = {
+          const songData = {
             id: 'import-' + Date.now(),
             title: parsed.title || file.name.replace(/\.(mid|midi|musicxml|xml)$/i, ''),
             tag: 'Imported',
@@ -1549,13 +1687,23 @@
             harmonyEvents: parsed.harmonyEvents,
             lyrics: []
           };
+          document.getElementById('modal-status').textContent = 'Uploading original file and saving song…';
+          const savedSong = await uploadToLibrary(file, songData);
+          const newSong = {
+            ...savedSong.song_data,
+            id: `cloud-${savedSong.id}`,
+            cloudId: savedSong.id,
+            title: savedSong.title,
+            tag: 'Shared'
+          };
           songs.push(newSong);
           saveSongs();
+          setSharedLibraryStatus(`Saved "${newSong.title}" to the shared library.`);
           modal.classList.add('hidden');
           state.currentSongId = newSong.id;
           showScreen('setup');
         } catch (err) {
-          document.getElementById('modal-status').textContent = 'Could not read file: ' + err.message;
+          document.getElementById('modal-status').textContent = err.message || 'Could not save this file.';
         }
         e.target.value = '';
       });
@@ -1617,6 +1765,19 @@
 
       window.onload = () => {
         initSplash();
+        if (sharedAccessCode && isCloudConfigured()) {
+          loadSharedSongs().then(() => {
+            document.getElementById('btn-library-access').textContent = 'Shared Library Unlocked';
+          }).catch(err => {
+            if (err.status === 401) {
+              sharedAccessCode = '';
+              try { localStorage.removeItem(ACCESS_CODE_KEY); } catch (_) {}
+            }
+            setSharedLibraryStatus(err.message || 'Could not load the shared library.', true);
+          });
+        } else if (!isCloudConfigured()) {
+          setSharedLibraryStatus('Shared cloud uploads need Cloudflare setup; built-in and locally saved songs still work.');
+        }
         requestAnimationFrame(drawFrame);
       };
     })();

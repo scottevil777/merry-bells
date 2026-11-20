@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "merry-bells-library",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-19",
+  "observability": {
+    "enabled": true
+  },
+  "r2_buckets": [
+    {
+      "binding": "MIDI_BUCKET",
+      "bucket_name": "merry-bells-midi-library"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "SONGS_DB",
+      "database_name": "merry-bells-library",
+      "database_id": "6a36c68f-44f1-4e13-83ff-13f0211a01f6",
+      "migrations_dir": "migrations"
+    }
+  ]
+}
